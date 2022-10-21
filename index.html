@@ -1,0 +1,165 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title> Teste stroop </title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="stylesheet" href="css/pure-min.css">
+		<link rel="stylesheet" href="css/style.css">
+
+		<!-- Insert this line above script imports  -->
+		<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+		<script src="js/jquery-3.0.0.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery.countdown360.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- Insert this line after script imports -->
+		<script>if (window.module) module = window.module;</script>
+	</head>
+
+<body>
+
+		<!--*******************************************************************************************!-->
+	<div id="FormularioNome">
+		<div id ="formNome" class="pure-form pure-form-aligned" >
+		<center><p><b>Olá!</b></p> Bem vindo ao teste Stroop.<br>
+		Antes de começar, precisamos de alguns dados:
+		<br><br>
+		</center>
+			<fieldset>
+					<div class="splash-container">
+					<label for="name">Nome</label>
+					<input id="nome" name="nome" type="text" placeholder="Nome" class="pure-input-rounded">
+					<br><br>
+					<label for="grupo">Grupo</label>
+					<br><br>
+					<input id="grupo_1" name="grupo" type="radio" value=1 class="pure-input-rounded"> Grupo 1 (Normal)
+					<br>
+					<input id="grupo_2" name="grupo" type="radio" value=2 class="pure-input-rounded"> Grupo 2 (Meditaçao)
+					<br>
+					</div>
+					<br><br>
+
+					<button class="pure-button pure-button-primary" name="botao" onClick="tutorial();">Começar</button>
+					<br><br>
+					<a class="pure-button pure-button-primary" id ="comecarBt" name="botao" href="professor.html">Gerenciar Resultados</a>
+					<br><br>
+					<button class="pure-button pure-button-secondary" id ="limparBt" name="limparResultados" onClick="limparDados();">Limpar Resultados</button>
+					<br><br>
+			</fieldset>
+		</div>
+		<div id ="formTutorial" class="pure-form pure-form-aligned" >
+			<center><p><b>Instruções!</b></p><br></center>
+				1) Preencha seu nome
+				<br><br>
+				2) No campo Grupo preencha o grupo correspondente:
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;1 para Normal
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;2 para Meditação
+				<br><br>
+				3) Clique em "Começar" para iniciar o teste.
+				<br><br>
+
+		</div>
+
+	</div>
+
+		<!--*******************************************************************************************!-->
+<div id="FormularioTutorial" style="display:none;">
+		<div class="pure-form" id="tutorial">
+			<center><p><b>Tutorial!</b></p><br></center>
+				&nbsp;&nbsp;1)Ao clicar no botão “Iniciar” você começará a relacionar a cor da palavra com o botão correspondente da mesma.
+				<br><br>
+				&nbsp;&nbsp;2)Durante o teste, as questões poderão ser congruentes ou incongruentes.
+				<br><br>
+				&nbsp;&nbsp;&nbsp;&nbsp;Nas congruentes, as palavras estarão coloridas com a cor que representam (verde escrito com a cor verde).
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;Use o exemplo abaixo para treinar.
+				<div id="tutorialCongruente" style="display:block;">
+					<p id ="labelTutorialCongruente"></p>
+						<div id="boxDeBotoesTutorialCongruente">
+							<input type="button" class="button-vermelho pure-button" value="Vermelho" id ="vermelho" onclick=clicouTutorialC("vermelho") />
+							<input type="button" class="button-azul pure-button" value="Azul" id ="azul" onclick=clicouTutorialC("azul") />
+							<input type="button" class="button-verde pure-button" value="Verde" id ="verde" onclick=clicouTutorialC("verde") />
+							<input type="button" class="button-roxo pure-button" value="Roxo" id ="roxo" onclick=clicouTutorialC("roxo") />
+							<input type="button" class="button-marrom pure-button" value="Preto" id ="verde" onclick=clicouTutorialC("marrom") />
+						</div>
+					<div id="respostaC"></div>
+				</div>
+				<br><br>
+				&nbsp;&nbsp;&nbsp;&nbsp;Nas incongruentes as palavras não estarão necessariamente coloridas com a sua cor (palavra verde colorida com a cor vermelha).
+				<br>
+				&nbsp;&nbsp;&nbsp;&nbsp;Use o exemplo abaixo para treinar.
+
+
+				<div id="tutorialIncongruente" style="display:block;">
+					<p id ="labelTutorialIncongruente"></p>
+						<div id="boxDeBotoesTutorialCongruente">
+							<input type="button" class="button-vermelho pure-button" value="Vermelho" id ="vermelho" onclick=clicouTutorialI("vermelho") />
+							<input type="button" class="button-azul pure-button" value="Azul" id ="azul" onclick=clicouTutorialI("azul") />
+							<input type="button" class="button-verde pure-button" value="Verde" id ="verde" onclick=clicouTutorialI("verde") />
+							<input type="button" class="button-roxo pure-button" value="Roxo" id ="roxo" onclick=clicouTutorialI("roxo") />
+							<input type="button" class="button-marrom pure-button" value="Preto" id ="verde" onclick=clicouTutorialI("marrom") />
+						</div>
+					<div id="respostaI"></div>
+				</div>
+				<br><br>
+				&nbsp;&nbsp;3)Na série seguinte você fará a mesma coisa com a diferença de a palavra não será correspondente a cor.
+				<br><br>
+				&nbsp;&nbsp;4) Haverá pausas de 5 segundos ao longo do teste.
+				<br><br>
+				&nbsp;&nbsp;5) Não feche o navegador enquanto realiza o teste.
+				<br><br>
+				&nbsp;&nbsp;6) Ao fim do teste, pode liberar o aparelho para o responsável.
+			<br><br>
+			<center>
+				<button class="pure-button pure-button-primary" name="botao" onClick="iniciar();">Iniciar</button>
+			</center>
+			<br><br>
+		</div>
+</div>
+
+		<!--*******************************************************************************************!-->
+
+		<div class="pure-form" id="corpo" style="display:none;">
+			<div id="botoes" style="display:block;">
+				<p id ="label"></p>
+					<div id="boxDeBotoes">
+						<input type="button" class="button-vermelho pure-button" value="Vermelho" id ="vermelho" onclick=clicou("vermelho") />
+						<input type="button" class="button-azul pure-button" value="Azul" id ="azul" onclick=clicou("azul") />
+						<input type="button" class="button-verde pure-button" value="Verde" id ="verde" onclick=clicou("verde") />
+						<input type="button" class="button-roxo pure-button" value="Roxo" id ="roxo" onclick=clicou("roxo") />
+						<input type="button" class="button-marrom pure-button" value="Preto" id ="verde" onclick=clicou("marrom") />
+					</div>
+				</br>
+				</br>
+				<div id="conta"></div>
+			</div>
+			<div id="final">
+				<input type="hidden" value='a' id ="nome"/>
+				<input type="hidden" value='a' id ="grupo"/>
+			</div>
+			<div id="voltar" style="display:none" >
+				<div id="botao">
+				<h2>Fim do teste Stroop</h2>
+				</br>
+				</br>
+				<input type="button" class="pure-button pure-button-primary" value="Voltar ao início" onclick=voltar() />
+			</div>
+		</div>
+</div>
+
+		<!--*******************************************************************************************!-->
+
+
+		<div id="countdown" style="display:none;"></div>
+
+
+		<!-- SCRIPT DAS CONFIGURACOES !--> <script type="text/javascript" src="js/configuracoes.js"></script>
+		<!-- SCRIPT DO PRE-TESTE !--> <script type="text/javascript" src="js/script_pre_teste.js"></script>
+		<!-- SCRIPT DO TESTE !--> <script type="text/javascript" src="js/script.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,197 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title> Teste stroop </title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="css/pure-min.css">
+<link rel="stylesheet" href="css/style.css">
+
+<script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
+<script src="js/jquery-3.1.1.min.js"></script>
+<script src='js/plotly-latest.min.js'></script>
+
+<script>if (window.module) module = window.module;</script>
+
+
+<style>
+	.spanErrou{
+		color:red;
+	}
+	.spanAcertou{
+		color:purple;
+	}
+	.exclueTeste{
+		color:red;
+	}
+	.js-plotly-plot{
+		position:relative;
+		width:90% !important;
+		left:5% !important;
+	}
+</style>
+</head>
+<body>
+<!--*******************************************************************************************!-->
+<div id="logado_main" style="display:none;">
+	<div class="header">
+
+		<div id= "horizontal" class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+			<a class="pure-menu-heading" href="index.html">STROOP</a>
+
+
+		</div>
+	<div id="lateral">
+			<div id="menu">
+				<h2> > </h2>
+				<h3 class="link-titulo">Menu</h3>
+				<ul class="box">
+								<li><a onClick="inicioTestes();" class="pure-menu-link">Início</a></li>
+								<li><a onClick="gerenciarTestes();" class="pure-menu-link">Gerenciar Testes</a></li>
+								<li><a onClick="configuracoes();" class="pure-menu-link">Configurações</a></li>
+								<li><a value='enviado' onClick="downloadCsv();">Baixar os resultados (planilha)</a></li>
+								<li><a  onClick="save_data();">Salvar dados (<i>.stroop</i>)</a></li>
+								<li><a class="pure-menu-link" onclick="getFile()"> Upload (<i>.stroop</i>)</a></li>
+								<div style='height: 0px;width: 0px; overflow:hidden;'>
+								<input id="upfile" type="file" value="upload" onchange="load_data(this.files)"/>
+								</div>
+								<li><a href="index.html">Fazer teste</a></li>
+						</ul>
+
+		</div> <!-- /#menu -->
+	</div> <!-- /#lateral -->
+	<br><br>
+</div>
+
+
+<center id='graficoC'></center>
+<center id='graficoI'></center>
+<center id='graficoCMedia'></center>
+<center id='graficoIMedia'></center>
+
+
+</div>
+<!--*******************************************************************************************!-->
+
+
+<!--*******************************************************************************************!-->
+<div id="logado_gerenciar" style="display:none;">
+	<div class="header">
+		<div id= "horizontal" class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+			<a class="pure-menu-heading" href="index.html">STROOP</a>
+
+		</div>
+		<div id="lateral">
+			<div id="menu">
+				<h2> > </h2>
+				<h3 class="link-titulo">Menu</h3>
+						<ul class="box">
+								<li><a onClick="inicioTestes();" class="pure-menu-link">Início</a></li>
+								<li><a onClick="gerenciarTestes();" class="pure-menu-link">Gerenciar Testes</a></li>
+								<li><a onClick="configuracoes();" class="pure-menu-link">Configurações</a></li>
+								<li><a value='enviado' onClick="downloadCsv();">Baixar os resultados (planilha)</a></li>
+								<li><a  onClick="save_data();">Salvar dados (<i>.stroop</i>)</a></li>
+								<li><a class="pure-menu-link" onclick="getFile()"> Upload (<i>.stroop</i>)</a></li>
+								<div style='height: 0px;width: 0px; overflow:hidden;'>
+								<input id="upfile" type="file" value="upload" onchange="load_data(this.files)"/>
+								</div>
+								<li><a href="index.html">Fazer teste</a></li>
+						</ul>
+		</div> <!-- /#menu -->
+	</div> <!-- /#lateral -->
+	</div>
+	<div id="externa">
+		<div id="corpoGerencia">
+			<center>Clique nos nomes para visualizar os detalhes</center><br>
+			<center id="gerencia_testes">
+
+			</center>
+		</div>
+	</div>
+</div>
+<!--*******************************************************************************************!-->
+
+<!--*******************************************************************************************!-->
+<div id="logado_config" style="display:none;">
+	<div class="header">
+		<div id= "horizontal" class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+			<a class="pure-menu-heading" href="index.html">STROOP</a>
+		</div>
+		<div id="lateral">
+			<div id="menu">
+				<h2> > </h2>
+				<h3 class="link-titulo">Menu</h3>
+						<ul class="box">
+							<li><a onClick="inicioTestes();" class="pure-menu-link">Início</a></li>
+							<li><a onClick="gerenciarTestes();" class="pure-menu-link">Gerenciar Testes</a></li>
+							<li><a onClick="configuracoes();" class="pure-menu-link">Configurações</a></li>
+							<li><a value='enviado' onClick="downloadCsv();">Baixar os resultados (planilha)</a></li>
+							<li><a  onClick="save_data();">Salvar dados (<i>.stroop</i>)</a></li>
+							<li><a class="pure-menu-link" onclick="getFile()"> Upload (<i>.stroop</i>)</a></li>
+							<div style='height: 0px;width: 0px; overflow:hidden;'>
+							<input id="upfile" type="file" value="upload" onchange="load_data(this.files)"/>
+							</div>
+							<li><a href="index.html">Fazer teste</a></li>
+						</ul>
+		</div> <!-- /#menu -->
+	</div> <!-- /#lateral -->
+	</div>
+
+	<div id="corpoConfig">
+		<center>
+			
+			<button onClick="config_selectPerguntas()"> Teste por perguntas</button>
+			<button onClick="config_selectTempo()" style="display:inline-block"> Teste por tempo</button>
+			<br><br>
+			
+			
+			<div id="config_perguntas" style="display:none">
+				Número de perguntas
+				<br>
+				<input type=number id="logado_config_numero_perguntas">
+				<br>
+				<br>
+				Número de perguntas nos pré testes
+				<br>
+				<input type=number id="logado_config_numero_perguntas_pre">
+				<br>
+				<br>
+				Ordem dos testes
+				<br>
+				<center id="logado_config_selects"></center>
+				<br>
+				<br>
+				<button onClick="logado_config_addTeste();">Adicionar teste</button>
+			</div>
+			
+			<div id="config_tempo" style="display:none">
+				Duração de cada teste (segundos)
+				<br>
+				<input type=number id="logado_config_tempoDuracao">
+			</div>
+			<br>
+			<br>
+			Tempo entre os testes<br>
+			<input type=number id="logado_config_tempoEntreTeste">
+		
+			<br>
+			<br>
+			<button onClick="logado_config_salvaConfig()">Salvar</button>
+		</center>
+
+	</div>
+</div>
+<!--*******************************************************************************************!-->
+
+
+<br><br>
+
+</body>
+<script src="js/professor.js"></script>
+<script src="js/save_data.js"></script>
+<script src="js/configuracoes.js"></script>
+
+<script> buscaTestes(); </script>
+</html>

@@ -1,0 +1,346 @@
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  select:focus,
+  textarea:focus,
+  input:focus {
+    font-size: 16px;
+    }
+}
+
+/* regra para o box-sizing */
+*, *:before, *:after {
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+/* regra para o clear float */
+.cf:before,
+.cf:after {content: " ";display: table;}
+.cf:after {clear: both;}
+.cf {*zoom: 1;}
+	#lateral {
+
+	-moz-transition: all 0.5s ease;
+	-webkit-transition: all 0.5s ease;
+	-o-transition: all 0.5s ease;
+
+	background:#53868B;
+	height:100%;
+	width:370px;
+	position:fixed;
+	top:0;
+	z-index:2;
+	left:-320px;
+	}
+
+#lateral:hover, #lateral:focus,  #lateral:active  {
+	overflow-y:scroll;
+	-moz-transform: translate(320px, 0);
+		-webkit-transform: translate(320px, 0);
+			-o-transform: translate(320px, 0);
+				transform: translate(320px, 0);
+	padding-right:0;
+
+	}
+  h2{
+    float: right;
+    margin-right: 10px;
+
+  }
+	#lateral .box {
+		list-style-type:none;
+		margin-bottom:1em;;
+		padding-bottom:1em;
+		}
+	#lateral h3 {
+		display:inline-block;
+		padding-bottom:0.2em;
+		margin: 2em 0 2em 0.81em;
+		color:rgb(255,255,255);
+		border-bottom: 4px solid rgb(155,155,155);
+  }
+	#menu {
+		position:relative;
+		margin:1em 0 1em -1em;
+		padding:0;
+		}
+
+	#menu li {padding:0; margin:0;}
+
+	#menu li a,  #menu li a:link {
+		color:rgb(255,255,255);
+		text-decoration: none;
+    cursor:pointer;
+		padding: 2em 0 2em 2em;
+		display: block;
+		-moz-transition: all 1.2s ease;
+				-webkit-transition: all 1.2s ease;
+					-o-transition: all 1.2s ease;
+						transition: all 1.2s ease;cursor:pointer;
+		}
+	#menu li a:hover {
+		color:rgb(255,255,255);
+		background-color:rgba(255,255,255,0.2);
+		-moz-transition: all 0.5s ease;
+				-webkit-transition: all 0.5s ease;
+					-o-transition: all 0.5s ease;
+						transition: all 0.5s ease;
+		}
+
+#header{
+	z-index:10;
+}
+#form{
+	margin: 20px auto;
+	width: 700px;
+	height: 200px;
+	padding: 10px;
+}
+
+fieldset{
+	margin: 0 auto;
+	text-align: center;
+	padding: 10px;
+
+}
+
+#label{
+	text-align: center;
+	font-size: 24px;
+	font-weight: bold;
+}
+#labelTutorialCongruente{
+	text-align: center;
+	font-size: 24px;
+	font-weight: bold;
+}
+#labelTutorialIncongruente{
+	text-align: center;
+	font-size: 24px;
+	font-weight: bold;
+}
+
+#conta{
+	text-align: center;
+	padding: 20px;
+	font-size: 10px;
+}
+
+#respostaC{
+	text-align: center;
+	padding: 20px;
+	font-size: 10px;
+}
+#respostaI{
+	text-align: center;
+	padding: 20px;
+	font-size: 10px;
+}
+b{
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: x-large;
+}
+
+#botoes{
+	 position: absolute;
+	 width: 100%;
+	 top: 15%;
+}
+#formNome{
+	position: absolute;
+	background: white;
+	top: 20%;
+	left: 50%;
+  max-width: 50%;
+  min-width: 20%;
+  max-height: 100%;
+	border-radius: 10%;
+	padding-right: 3%;
+	padding-left: 3%;
+  overflow: scroll;
+
+}
+#tutorial{
+	position: absolute;
+	background: white;
+	top: 5%;
+	left: 5%;
+	border-radius: 30px;
+	padding-right: 40px;
+	padding-left: 40px;
+  overflow: scroll;
+
+}
+#formTutorial{
+  position: absolute;
+	background: white;
+	left: 0%;
+  max-width: 30%;
+	padding-right: 1%;
+	padding-left: 1%;
+  height: 100%;
+  overflow: scroll;
+}
+#voltar{
+  position:absolute;
+  top:0;
+  left:0;
+  background-color:#A2B5CD;
+  width:100%;
+  height:100%;
+}
+#comecarBt{
+  max-width: 60%;
+  max-height: 60%;
+  min-width: 30%;
+  min-height: 30%;
+}
+#botao{
+  position: fixed;
+	background: white;
+	top: 50%;
+	left: 50%;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  border-radius: 10%;
+  text-align: center;
+}
+#conta{
+	text-align: center;
+}
+
+#FormularioNome{
+	position:absolute;
+	top:0;
+	left:0;
+  margin: inherit;;
+  padding:0;
+	background-color:#A2B5CD;
+	width:100%;
+	max-height:100%;
+  min-height: 100%;
+  overflow: scroll;
+}
+#FormularioTutorial{
+	position:absolute;
+	top:0;
+	left:0;
+	background-color:#A2B5CD;
+	width:100%;
+	min-height: 150%;
+  overflow: scroll;
+}
+
+@media screen and (max-width: 450px) {
+	[class*="button-"] {
+		display: block;
+		width: 105px;
+		margin-left: 50%;
+		margin-bottom: 10px;
+		transform: translateX(-50%);
+	}
+}
+
+
+.button-verde {
+            background: rgb(28, 184, 65); /* this is a green */
+			font-family: 'Noto Sans', sans-serif;
+			color: #fff;
+        }
+.button-vermelho {
+            background: rgb(202, 60, 60); /* this is a maroon */
+			font-family: 'Noto Sans', sans-serif;
+			color: #fff;
+        }
+.button-azul {
+            background: rgb(18, 83, 173); /* this is a light blue */
+			font-family: 'Noto Sans', sans-serif;
+			color: #fff;
+        }
+.button-roxo {
+			background: rgb(143, 48, 153); /* roxo*/
+			font-family: 'Noto Sans', sans-serif;
+			color: #fff;
+}
+
+.button-marrom {
+			background: #000000; /*Marrom*/
+			font-family: 'Noto Sans', sans-serif;
+			color: #fff;
+}
+
+.pure-menu-selected{
+			outline-width:1px;
+			margin:1px;
+			padding:1px;
+			outline-style:solid;
+			outline-color: rgba(0,0,0,0.5);
+}
+#horizontal{
+  background:	#53868B;
+
+}
+
+
+#graficoC
+{
+	z-index: 1;
+}
+#graficoI
+{
+	z-index: 1;
+}
+#graficoIMedia
+{
+	z-index: 1;
+}
+#graficoCMedia
+{
+	z-index: 1;
+}
+#corpoConfig{
+  position: absolute;
+  background-color: white;
+	top: 10%;
+  left:40%;
+  border-radius: 30px;
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+#corpoGerencia{
+  position: absolute;
+  top: 10%;
+  left:40%;
+  border-radius: 30px;
+}
+#externa{
+	position:absolute;
+	top:100px;
+	left:0;
+	background-color:white;
+	width:100%;
+	height:100%;
+}
+
+
+#boxDeBotoes {
+	text-align: center;
+}
+#boxDeBotoesTutorialCongruente {
+	text-align: center;
+}
+#countdown {
+
+	position: absolute;
+}
+::-webkit-scrollbar {
+    width: 0px;
+}
+
+
+@media only screen and (max-width: 2000px) {
+       body { font-size: 100%; }
+}
