@@ -54,16 +54,6 @@ function getConfiguracoes(){
 	return __configs;
 }
 
-
-
-//console.log(getConfiguracoes());
-
-
-
-
-
-
-
 function config_selectPerguntas(){
 	__configs.tipoTeste = 0;
 	$("#config_perguntas").css("display","inline");
@@ -196,15 +186,24 @@ function logado_config_salvaConfig(){
 	
 }
 
-function downloadCsv(){
+function mediaTeste(teste){
+	var soma = 0;
+
+	acertos = teste.filter(t => t.acertou)
+	erros = teste.filter(t => !t.acertou)
+
+	soma = teste.reduce((a,b) => a+parseFloat(b.tempo), 0.0)
+	
+	return [soma/teste.length,acertos.length,erros.length];
+}
+
+function downloadCsv() {
 	var tempos = []
 	for (var teste in dataSet){
 		tempos.push(buscaTempoResposta(dataSet[teste].stringResposta[0]));
 	}
-	var data = tempos;
+
 	var csvContent = "data:text/csv;charset=utf-8,";
-
-
 	
 	if(dataSet.length < 1){
 		alert("Não há nenhum teste registrado!");
@@ -213,190 +212,149 @@ function downloadCsv(){
 
 	ordemFiltrada = filtraOrdemBateria(dataSet[0].ordemBateria);
 	
-	function scpAspas(t){
-		return "\""+t+"\"";
-	}
-	
 	var tabela = [];
 	tabela.push([]);
 	tabela[0][0] = "\"\"";
-	
 	
 	var congruenteIndex = [];
 	var incongruenteIndex = [];
 	for(i in ordemFiltrada){
 		if(ordemFiltrada[i] == "C"){
 			congruenteIndex.push(parseInt(i));
-			//tabela[0].push(","+scapeAspasSimples(ordemFiltrada[i]));
 		}
 		if(ordemFiltrada[i] == "I"){
 			incongruenteIndex.push(parseInt(i));
 		}
-		
 	}
-	var numCongruentes = congruenteIndex.length;
-	var numIncongruentes = incongruenteIndex.length;
+
+	tabela[0].push(`,"Tentativas","Erro C","Acertos C","Media C"`);
+
+	tabela[0].push(`,"Erro C M","Acertos C M","Media C M"`);
+
+	tabela[0].push(`,"Erro I","Acertos I","Media I"`);
 	
-	
-	
-	for(var i = 0; i < numCongruentes; i++){
-		tabela[0].push(",\"C "+(i+1)+"\"");
-	}
-	tabela[0].push(",\"Média C\",\"Dev Pad C\", \"Erro C\", \"Acertos C\"");
-	
-	for(var i = 0; i < numCongruentes; i++){
-		tabela[0].push(",\"C M"+(i+1)+"\"");
-	}
-	tabela[0].push(",\"Média C M \",\"Dev Pad C M\", \"Erro C M\", \"Acertos C M\"");
-	
-	for(var i = 0; i < numIncongruentes; i++){
-		tabela[0].push(",\"I "+(i+1)+"\"");
-	}
-	tabela[0].push(",\"Média I\",\"Dev Pad I\", \"Erro I\", \"Acertos I\"");
-	
-	for(var i = 0; i < numIncongruentes; i++){
-		tabela[0].push(",\"I M"+(i+1)+"\"");
-	}
-	tabela[0].push(",\"Média I M \",\"Dev Pad I M\", \"Erro I M\", \"Acertos I M\"");
-	
+	tabela[0].push(`,"Erro I M","Acertos I M","Media I M"`);
 	
 	var dicionario = {}
-	for(var i in dataSet){
-		if(dataSet[i].nome in dicionario){
+
+	for(var i in dataSet) {
+		if(dataSet[i].nome in dicionario) {
 			dicionario[dataSet[i].nome].push(dataSet[i]);
 		}
-		else{
+		else {
 			dicionario[dataSet[i].nome] = [dataSet[i]];
 		}
 	}
 	
-	
-	function mediaTeste(teste){
-		var acertos = 0;
-		var soma = 0;
-		for(var i in teste){
-			if(teste[i].acertou){
-				soma+=parseFloat(teste[i].tempo);
-				acertos++;
-				
-			}
-			//console.log(teste[i]);
-		}
-		var media = 0;
-		if(acertos > 0){
-			media = (soma/acertos);
-		}
-		
-		return {media: media, acertos: acertos};
-	}
-	
-	
-	for(p in dicionario){
+	var i = 1
+
+	for(p in dicionario) {
 		var line = [p];
 		var pessoa = dicionario[p];
-		var acertosTotais = 0;
+		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0, tentativas = 0;
+
 		for(b in pessoa){
 			var bateria = pessoa[b];
-			if(bateria.grupo == 1){
-				for(var j in congruenteIndex){
-					var index = congruenteIndex[j];
-					media = mediaTeste(bateria.stringResposta[index]);
-					acertosTotais+=media.acertos;
-					line.push(","+scpAspas(media.media))
-				}
+
+			tentativas += bateria.stringResposta.reduce((a,b) => a+b.length, 0);
+
+			for(var j in congruenteIndex) {
+				var index = congruenteIndex[j];
+				mediaTempo = mediaTeste(bateria.stringResposta[index]);
+
+				mediaTotal = (mediaTempo[0]+mediaTotal)/2;
+				acertosTotais += mediaTempo[1];
+				errosTotais += mediaTempo[2]
 			}
 		}
-		line.push(",\"\""); //media
-		line.push(",\"\""); //desvio padrao
-		line.push(",\"\""); //erro
-		line.push(","+scpAspas(acertosTotais));
-		tabela.push(line);
+
+		line.push(`,"${tentativas}"`)
+		line.push(`,"${errosTotais}"`);
+		line.push(`,"${acertosTotais}"`);
+		line.push(`,"${mediaTotal}"`);
+
+		tabela[i] = line
+		i++
 	}
 	
 	var i = 1;
 	for(p in dicionario){
+		var line = []
 		var pessoa = dicionario[p];
-		var acertosTotais = 0;
+		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
+
 		for(b in pessoa){
 			var bateria = pessoa[b];
 			if(bateria.grupo == 2){
-				for(var j in congruenteIndex){
+				for(var j in congruenteIndex) {
 					var index = congruenteIndex[j];
-					media = mediaTeste(bateria.stringResposta[index]);
-					acertosTotais+=media.acertos;
-					
-					tabela[i].push(","+scpAspas(media.media))
+					mediaTempo = mediaTeste(bateria.stringResposta[index]);
+
+					mediaTotal = (mediaTempo[0]+mediaTotal)/2;
+					acertosTotais += mediaTempo[1];
+					errosTotais += mediaTempo[2]
 				}
 			}
 		}
-		tabela[i].push(",\"\""); //media
-		tabela[i].push(",\"\""); //desvio padrao
-		tabela[i].push(",\"\""); //erro
-		tabela[i].push(","+scpAspas(acertosTotais));
-		
-		i++;
+
+		tabela[i].push(`,"${errosTotais}"`);
+		tabela[i].push(`,"${acertosTotais}"`);
+		tabela[i].push(`,"${mediaTotal}"`);
 	}
 	
 	var i = 1;
 	for(p in dicionario){
+		var line = []
 		var pessoa = dicionario[p];
-		var acertosTotais = 0;
+		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
 		
 		for(b in pessoa){
 			var bateria = pessoa[b];
-			if(bateria.grupo == 1){
+			if(bateria.grupo == 1) {
 				for(var j in incongruenteIndex){
 					var index = incongruenteIndex[j];
-					media = mediaTeste(bateria.stringResposta[index]);
-					acertosTotais+=media.acertos;
-					
-					tabela[i].push(","+scpAspas(media.media));
-					
+					mediaTempo = mediaTeste(bateria.stringResposta[index]);
+
+					mediaTotal = (mediaTempo[0]+mediaTotal)/2;
+					acertosTotais += mediaTempo[1];
+					errosTotais += mediaTempo[2]
 				}
 			}
 		}
-		tabela[i].push(",\"\""); //media
-		tabela[i].push(",\"\""); //desvio padrao
-		tabela[i].push(",\"\""); //erro
-		tabela[i].push(","+scpAspas(acertosTotais));
-		
-		i++;
+
+		tabela[i].push(`,"${errosTotais}"`);
+		tabela[i].push(`,"${acertosTotais}"`);
+		tabela[i].push(`,"${mediaTotal}"`);
 	}
 	
 	
 	var i = 1;
 	for(p in dicionario){
+		var line = []
 		var pessoa = dicionario[p];
-		var acertosTotais = 0;
+		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
+		
 		for(b in pessoa){
 			var bateria = pessoa[b];
-			if(bateria.grupo == 2){
+
 				for(var j in incongruenteIndex){
 					var index = incongruenteIndex[j];
-					media = mediaTeste(bateria.stringResposta[index]);
-					acertosTotais+=media.acertos;
-					
-					tabela[i].push(","+scpAspas(media.media))
+					mediaTempo = mediaTeste(bateria.stringResposta[index]);
+
+					mediaTotal = (mediaTempo[0]+mediaTotal)/2;
+					acertosTotais += mediaTempo[1];
+					errosTotais += mediaTempo[2];
 				}
-			}
 		}
-		tabela[i].push(",\"\""); //media
-		tabela[i].push(",\"\""); //desvio padrao
-		tabela[i].push(",\"\""); //erro
-		tabela[i].push(","+scpAspas(acertosTotais));
-		
-		i++;
+
+		tabela[i].push(`,"${errosTotais}"`);
+		tabela[i].push(`,"${acertosTotais}"`);
+		tabela[i].push(`,"${mediaTotal}"`);
 	}
-	
-	
-	
-	
 	
 	for(var l in tabela){
 		csvContent+= tabela[l].join("")+"\n";
 	}
-	
-	
 
 	var encodedUri = encodeURI(csvContent);
 	var link = document.createElement("a");

@@ -22,7 +22,6 @@ function limparDados() {
     }
 }
 
-
 var configs = getConfiguracoes();
 
 
