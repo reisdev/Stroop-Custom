@@ -46,18 +46,16 @@ var tempoRestanteRepouso = tempoRepouso;
 
 var intervalTempo; // Guarda o setInterval do tempo
 
+const teclasTeclado = {
+    "1": "vermelho", "2": "azul", "3": "verde", "4": "roxo", "5": "preto"
+}
+
 document.addEventListener('keydown', function(event) {
     if (ordemBateria[testeAtual] != "F") {
-        if (event.keyCode == 49) {
-            clicou('vermelho');
-        } else if (event.keyCode == 50) {
-            clicou('azul');
-        } else if (event.keyCode == 51) {
-            clicou('verde');
-        } else if (event.keyCode == 52) {
-            clicou('roxo');
-        } else if (event.keyCode == 53) {
-            clicou('marrom');
+        let cor = teclasTeclado[event.key]
+
+        if(cor !== null) {
+            clicou(cor)
         }
     }
 });
@@ -68,7 +66,6 @@ function forceFim() {
 
 	document.getElementById("conta").innerHTML = "";
 	document.getElementById("voltar").style.display = "inline";
-
 
 	var cont = 0;
 	var achados = 0;
