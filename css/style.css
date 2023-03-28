@@ -137,28 +137,22 @@ fieldset {
 #conta {
   text-align: center;
   padding: 20px;
-  font-size: 10px;
+  font-size: 16px;
 }
 
-#respostaC {
+.resposta {
   text-align: center;
   padding: 20px;
-  font-size: 10px;
+  font-size: 12px;
 }
-#respostaI {
-  text-align: center;
-  padding: 20px;
-  font-size: 10px;
-}
+
 b {
   font-family: "Source Sans Pro", sans-serif;
   font-size: x-large;
 }
 
 #botoes {
-  position: absolute;
   width: 100%;
-  top: 15%;
 }
 
 body {
@@ -204,24 +198,19 @@ body {
   min-width: 30%;
   min-height: 30%;
 }
-#botao {
-  position: fixed;
+#finalStroop {
   background: white;
-  top: 50%;
-  left: 50%;
-  padding-left: 30px;
-  padding-right: 30px;
-  padding-top: 30px;
-  padding-bottom: 30px;
-  border-radius: 10%;
+  padding: 30px;
+  border-radius: 12px;
   text-align: center;
+  box-shadow: 0px 0px 3px lightgrey;
 }
+
 #conta {
   text-align: center;
 }
 
 #FormularioTutorial {
-  background-color: #a2b5cd;
   max-width: 1024px;
   overflow: scroll;
 }
@@ -256,23 +245,24 @@ body {
   font-family: "Noto Sans", sans-serif;
   color: #fff;
 }
-
 .button-marrom {
   background: #000000; /*Marrom*/
   font-family: "Noto Sans", sans-serif;
   color: #fff;
 }
-
 .button-group {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 8px;
 }
-
 .button-group > :nth-child(2n) {
   margin-top: 8px;
   margin-bottom: 8px;
+}
+
+.center-aligned {
+  text-align: center;
 }
 
 .pure-menu-selected {
@@ -327,7 +317,7 @@ body {
 #boxDeBotoes {
   text-align: center;
 }
-#boxDeBotoesTutorialCongruente {
+#boxDeBotoesTutorialCongruente, #boxDeBotoesTutorialIncongruente {
   text-align: center;
 }
 #countdown {
