@@ -12,14 +12,18 @@ var numeroTestes = 0;
 
 var __configsDefault = {
 	"ordemBateria": ["I", "F"],
+	"tipoInicioInpacs": "I",
+	"perguntasINPACS": 75,
 	"perguntas": 6,
 	"perguntasPre": 6,
 	"tipoTeste": 0, //1 para tempo, 0 para perguntas
 	"tempoTeste": 5, //Segundos
-	"tempoEntreTeste": 5
+	"tempoEntreTeste": 5,
 };
 
 var __configs = {
+	"tipoInicioInpacs": null,
+	"perguntasINPACS": null,
 	"perguntas": null,
 	"perguntasPre": null,
 	"ordemBateria": null,
@@ -178,20 +182,17 @@ function logado_config_salvaConfig() {
 }
 
 function mediaTeste(teste) {
-	var soma = 0;
+	acertos = teste.filter(t => t.acertou).length
+	erros = teste.length - acertos
+	mediaTempo = teste.reduce((a, b) => a + parseFloat(b.tempo), 0.0) / teste.length
 
-	acertos = teste.filter(t => t.acertou)
-	erros = teste.filter(t => !t.acertou)
-
-	soma = teste.reduce((a, b) => a + parseFloat(b.tempo), 0.0)
-
-	return [soma / teste.length, acertos.length, erros.length];
+	return [mediaTempo, acertos, erros];
 }
 
 function downloadCsv() {
 	var tempos = []
 	for (var teste in dataSet) {
-		tempos.push(buscaTempoResposta(dataSet[teste].stringResposta[0]));
+		tempos.push(buscaTempoResposta(dataSet[teste].respostaStroop[0]));
 	}
 
 	var csvContent = "data:text/csv;charset=utf-8,";
@@ -200,28 +201,11 @@ function downloadCsv() {
 		alert("Não há nenhum teste registrado!");
 		return;
 	}
-
-	ordemFiltrada = filtraOrdemBateria(dataSet[0].ordemBateria);
-
+	
 	var tabela = [];
-	tabela.push([]);
-	tabela[0][0] = "\"\"";
+	tabela.push([""]);
 
-	var congruenteIndex = [];
-	var incongruenteIndex = [];
-	for (i in ordemFiltrada) {
-		if (ordemFiltrada[i] == "C") {
-			congruenteIndex.push(parseInt(i));
-		}
-		if (ordemFiltrada[i] == "I") {
-			incongruenteIndex.push(parseInt(i));
-		}
-	}
-
-	tabela[0].push(`,"Tentativas","Erro C","Acertos C","Media C"`);
-	tabela[0].push(`,"Erro C M","Acertos C M","Media C M"`);
-	tabela[0].push(`,"Erro I","Acertos I","Media I"`);
-	tabela[0].push(`,"Erro I M","Acertos I M","Media I M"`);
+	tabela[0].push(`"Nome","Tempo médio","Erros","Acertos"`);
 
 	var dicionario = {}
 
@@ -239,105 +223,28 @@ function downloadCsv() {
 	for (p in dicionario) {
 		var line = [p];
 		var pessoa = dicionario[p];
-		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0, tentativas = 0;
+		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
 
 		for (b in pessoa) {
 			var bateria = pessoa[b];
 
-			tentativas += bateria.stringResposta.reduce((a, b) => a + b.length, 0);
+			let [tempoParcial, acertoParcial, erroParcial] = bateria.respostaStroop.reduce((a,b) => {
+				[tParcial ,aParcial, eParcial] = mediaTeste(b);
+				return [a[0]+tParcial,a[1]+aParcial,a[2]+eParcial]
+			}, [0,0,0]);
 
-			for (var j in congruenteIndex) {
-				var index = congruenteIndex[j];
-				mediaTempo = mediaTeste(bateria.stringResposta[index]);
 
-				mediaTotal = (mediaTempo[0] + mediaTotal) / 2;
-				acertosTotais += mediaTempo[1];
-				errosTotais += mediaTempo[2]
-			}
+			mediaTotal += mediaTotal == 0 ? tempoParcial : (tempoParcial + mediaTotal) / 2;
+			acertosTotais += acertoParcial;
+			errosTotais += erroParcial;
 		}
 
-		line.push(`,"${tentativas}"`)
+		line.push(`,"${mediaTotal.toFixed(2)}"`);
 		line.push(`,"${errosTotais}"`);
 		line.push(`,"${acertosTotais}"`);
-		line.push(`,"${mediaTotal}"`);
 
 		tabela[i] = line
 		i++
-	}
-
-	var i = 1;
-	for (p in dicionario) {
-		var line = []
-		var pessoa = dicionario[p];
-		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
-
-		for (b in pessoa) {
-			var bateria = pessoa[b];
-			if (bateria.grupo == 2) {
-				for (var j in congruenteIndex) {
-					var index = congruenteIndex[j];
-					mediaTempo = mediaTeste(bateria.stringResposta[index]);
-
-					mediaTotal = (mediaTempo[0] + mediaTotal) / 2;
-					acertosTotais += mediaTempo[1];
-					errosTotais += mediaTempo[2]
-				}
-			}
-		}
-
-		tabela[i].push(`,"${errosTotais}"`);
-		tabela[i].push(`,"${acertosTotais}"`);
-		tabela[i].push(`,"${mediaTotal}"`);
-	}
-
-	var i = 1;
-	for (p in dicionario) {
-		var line = []
-		var pessoa = dicionario[p];
-		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
-
-		for (b in pessoa) {
-			var bateria = pessoa[b];
-			if (bateria.grupo == 1) {
-				for (var j in incongruenteIndex) {
-					var index = incongruenteIndex[j];
-					mediaTempo = mediaTeste(bateria.stringResposta[index]);
-
-					mediaTotal = (mediaTempo[0] + mediaTotal) / 2;
-					acertosTotais += mediaTempo[1];
-					errosTotais += mediaTempo[2]
-				}
-			}
-		}
-
-		tabela[i].push(`,"${errosTotais}"`);
-		tabela[i].push(`,"${acertosTotais}"`);
-		tabela[i].push(`,"${mediaTotal}"`);
-	}
-
-
-	var i = 1;
-	for (p in dicionario) {
-		var line = []
-		var pessoa = dicionario[p];
-		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
-
-		for (b in pessoa) {
-			var bateria = pessoa[b];
-
-			for (var j in incongruenteIndex) {
-				var index = incongruenteIndex[j];
-				mediaTempo = mediaTeste(bateria.stringResposta[index]);
-
-				mediaTotal = (mediaTempo[0] + mediaTotal) / 2;
-				acertosTotais += mediaTempo[1];
-				errosTotais += mediaTempo[2];
-			}
-		}
-
-		tabela[i].push(`,"${errosTotais}"`);
-		tabela[i].push(`,"${acertosTotais}"`);
-		tabela[i].push(`,"${mediaTotal}"`);
 	}
 
 	for (var l in tabela) {

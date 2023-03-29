@@ -45,7 +45,7 @@
       3) Clique em "Começar" para iniciar o teste.
       <br /><br />
     </div>
-    <div id="formNome" class="pure-form pure-form-aligned">
+    <form id="formNome" class="pure-form pure-form-aligned" onsubmit="tutorial(event.target.elements)" action="javascript:void(0);">
       <div class="center-aligned">
         <p><b>Olá!</b></p>
         Bem vindo ao teste Stroop.<br>
@@ -68,18 +68,18 @@
         </div>
 
         <div class="button-group">
-          <button class="pure-button pure-button-primary" name="botao" onClick="tutorial();">
+          <button type="submit" class="pure-button pure-button-primary" name="botao">
             Começar
           </button>
           <a class="pure-button pure-button-primary" id="comecarBt" name="botao" href="professor.html">Gerenciar
             Resultados</a>
-          <button class="pure-button pure-button-secondary" id="limparBt" name="limparResultados"
+          <button class="pure-button pure-button-secondary" id="limparBt" name="limparResultados" type="reset"
             onClick="limparDados();">
             Limpar Resultados
           </button>
         </div>
       </fieldset>
-    </div>
+    </form>
   </div>
   </div>
 
@@ -153,15 +153,15 @@
 
   <!--*******************************************************************************************!-->
 
-  <div class="pure-form" id="corpo" style="display: none">
+  <div class="pure-form" id="TesteStroop" style="display: none">
     <div id="botoes" style="display: block">
-      <p id="label"></p>
-      <form id="boxDeBotoes" onsubmit="respostaStroop(event.submitter.value)" action="javascript:void(0);">
-        <button type="submit" class="pure-button" value="vermelho">Vermelho</button>
-        <button type="submit" class="pure-button" value="azul">Azul</button>
-        <button type="submit" class="pure-button" value="verde">Verde</button>
-        <button type="submit" class="pure-button" value="roxo">Roxo</button>
-        <button type="submit" class="pure-button" value="preto">Preto</button>
+      <p class="labelTeste" id="label-Stroop"></p>
+      <form class="center-aligned" onsubmit="respostaStroop(event.submitter.value)" action="javascript:void(0);">
+        <button type="submit" class="pure-button opcao" value="vermelho">Vermelho</button>
+        <button type="submit" class="pure-button opcao" value="azul">Azul</button>
+        <button type="submit" class="pure-button opcao" value="verde">Verde</button>
+        <button type="submit" class="pure-button opcao" value="roxo">Roxo</button>
+        <button type="submit" class="pure-button opcao" value="preto">Preto</button>
       </form>
       <br>
       <br>
@@ -185,16 +185,17 @@
 
   <!--*******************************************************************************************!-->
 
-  <div class="pure-form" id="TesteINPACS" style="display: none" action="javascript:void(0);">
+  <div class="pure-form center-aligned" id="TesteINPACS" style="display: none" action="javascript:void(0);">
     <div id="botoes" style="display: block">
-      <p id="label"></p>
-      <form id="boxDeBotoes">
-        <input type="button" type="submit" class="pure-button" id="opcao-1" />
-        <input type="button" type="submit" class="pure-button" id="opcao-2" />
+      <p class="labelTeste" id="label-INPACS"></p>
+      <form class="center-aligned" onsubmit="respostaINPACS(event.submitter.value)" action="javascript:void(0);">
+        <button type="submit" class="pure-button opcao" id="opcao-1">Azul</button>
+        <button type="submit" class="pure-button opcao" id="opcao-2">Verde</button>
+      </form>
     </div>
     <br />
     <br />
-    <div id="conta"></div>
+    <div id="conta-inpacs"></div>
   </div>
   <div id="final">
     <input type="hidden" value="a" id="nome" />

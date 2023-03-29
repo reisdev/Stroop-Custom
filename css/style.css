@@ -115,12 +115,13 @@ fieldset {
   padding: 10px;
 }
 
-#label {
+.labelTeste {
   text-align: center;
   font-size: 32px;
   font-weight: bold;
   text-transform: uppercase;
 }
+
 #labelTutorialCongruente {
   text-align: center;
   font-size: 32px;
@@ -138,6 +139,10 @@ fieldset {
   text-align: center;
   padding: 20px;
   font-size: 16px;
+}
+
+.opcao {
+  text-transform: capitalize;
 }
 
 .resposta {
@@ -314,9 +319,6 @@ body {
   height: 100%;
 }
 
-#boxDeBotoes {
-  text-align: center;
-}
 #boxDeBotoesTutorialCongruente, #boxDeBotoesTutorialIncongruente {
   text-align: center;
 }

@@ -6,7 +6,7 @@ function save_data(){
 	}
 	var tempos = []
 	for (var teste in dataSet){
-		tempos.push(buscaTempoResposta(dataSet[teste].stringResposta[0]));
+		tempos.push(buscaTempoResposta(dataSet[teste].respostaStroop[0]));
 	}
 	var data = tempos;
 	var csvContent = "data:text/csv;charset=utf-8,";
