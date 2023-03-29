@@ -190,22 +190,14 @@ function mediaTeste(teste) {
 }
 
 function downloadCsv() {
-	var tempos = []
-	for (var teste in dataSet) {
-		tempos.push(buscaTempoResposta(dataSet[teste].respostaStroop[0]));
-	}
-
-	var csvContent = "data:text/csv;charset=utf-8,";
-
 	if (dataSet.length < 1) {
 		alert("Não há nenhum teste registrado!");
 		return;
 	}
 	
-	var tabela = [];
-	tabela.push([""]);
-
-	tabela[0].push(`"Nome","Tempo médio","Erros","Acertos"`);
+	var tabelaStroop = [[`"Tempo médio","Erros","Acertos"`]];
+	var tabelaInpacsPre = [[`"Tipo","Tempo médio","Erros","Acertos"`]];
+	var tabelaInpacsPos = [[`"Tipo","Tempo médio","Erros","Acertos"`]];
 
 	var dicionario = {}
 
@@ -218,44 +210,87 @@ function downloadCsv() {
 		}
 	}
 
-	var i = 1
-
+	// Gera csv INPACS Pre
 	for (p in dicionario) {
-		var line = [p];
 		var pessoa = dicionario[p];
 		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
 
-		for (b in pessoa) {
-			var bateria = pessoa[b];
+		pessoa.forEach((bateria) => {
+			bateria.respostaInpacsPre.forEach(bloco => {
+				let [tempoParcial, acertoParcial, erroParcial] = mediaTeste(bloco)
+				
+				mediaTotal = mediaTotal == 0 ? tempoParcial : (tempoParcial + mediaTotal) / 2;
+				acertosTotais += acertoParcial;
+				errosTotais += erroParcial;
 
+				tabelaInpacsPre.push([`"${bloco[0].tipo}"`,`"${tempoParcial.toFixed(2)}"`,`"${erroParcial}"`,`"${acertoParcial}"`])
+			})
+		});
+
+		tabelaInpacsPre.push([`"Geral"`,`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
+	}
+
+	let conteudoTabelaInpacsPre = tabelaInpacsPre.join("\n") + "\n";
+
+	geraCsv(conteudoTabelaInpacsPre, "INPACS-PRE.csv");
+
+	// Gera csv Stroop
+	for (p in dicionario) {
+		var pessoa = dicionario[p];
+		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
+
+		pessoa.forEach((bateria) => {
 			let [tempoParcial, acertoParcial, erroParcial] = bateria.respostaStroop.reduce((a,b) => {
 				[tParcial ,aParcial, eParcial] = mediaTeste(b);
 				return [a[0]+tParcial,a[1]+aParcial,a[2]+eParcial]
 			}, [0,0,0]);
 
-
 			mediaTotal += mediaTotal == 0 ? tempoParcial : (tempoParcial + mediaTotal) / 2;
 			acertosTotais += acertoParcial;
 			errosTotais += erroParcial;
-		}
+		});
 
-		line.push(`,"${mediaTotal.toFixed(2)}"`);
-		line.push(`,"${errosTotais}"`);
-		line.push(`,"${acertosTotais}"`);
-
-		tabela[i] = line
-		i++
+		tabelaStroop.push([`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
 	}
 
-	for (var l in tabela) {
-		csvContent += tabela[l].join("") + "\n";
+	let conteudoTabelaStroop = tabelaStroop.join("\n") + "\n";
+
+	geraCsv(conteudoTabelaStroop, "STROOP.csv");
+
+	// Gera csv INPACS Pós
+	for (p in dicionario) {
+		var pessoa = dicionario[p];
+		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
+
+		pessoa.forEach((bateria) => {
+			bateria.respostaInpacsPos.forEach(bloco => {
+				let [tempoParcial, acertoParcial, erroParcial] = mediaTeste(bloco)
+	
+				mediaTotal = mediaTotal == 0 ? tempoParcial : (tempoParcial + mediaTotal) / 2;
+				acertosTotais += acertoParcial;
+				errosTotais += erroParcial;
+
+				tabelaInpacsPos.push([`"${bloco[0].tipo}"`,`"${tempoParcial.toFixed(2)}"`,`"${erroParcial}"`,`"${acertoParcial}"`])
+			})
+		});
+
+		tabelaInpacsPos.push([`"Geral"`,`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
 	}
 
-	var encodedUri = encodeURI(csvContent);
-	var link = document.createElement("a");
+	let conteudoTabelaInpacsPos = tabelaInpacsPos.join("\n") + "\n";
+
+	geraCsv(conteudoTabelaInpacsPos, "INPACS-POS.csv");
+}
+
+function geraCsv(conteudo, nome) {
+	let csvContent = "data:text/csv;charset=utf-8,";
+	let encodedUri = encodeURI(csvContent + conteudo);
+	let link = document.createElement("a");
 	link.setAttribute("href", encodedUri);
-	link.setAttribute("download", "my_data.csv");
+	link.setAttribute("download", nome);
 	document.body.appendChild(link); // Required for FF
 
-	link.click(); // This will download the data file named "my_data.csv".
+	link.click();
+
+	document.body.removeChild(link);
 }

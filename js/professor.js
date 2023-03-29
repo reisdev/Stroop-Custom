@@ -277,7 +277,6 @@ function plotaGraficoX(/*vetX,vetY */indice, idHTML, grafico) {
 function plotaGraficoMedia(graficoGlobal, indice, idHTML, grafico) {
 
 	var vetLinhas = [];
-
 	var media = [];
 	var acertos = [];
 	var acertosAbsolutos = 0;

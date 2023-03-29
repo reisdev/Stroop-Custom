@@ -73,7 +73,7 @@
           </button>
           <a class="pure-button pure-button-primary" id="comecarBt" name="botao" href="professor.html">Gerenciar
             Resultados</a>
-          <button class="pure-button pure-button-secondary" id="limparBt" name="limparResultados" type="reset"
+          <button class="pure-button pure-button-secondary" id="limparBt" name="limparResultados" type="button"
             onClick="limparDados();">
             Limpar Resultados
           </button>
@@ -171,13 +171,14 @@
       <input type="hidden" value="a" id="nome" />
       <input type="hidden" value="a" id="grupo" />
     </div>
-    <div id="voltar" style="display: none">
-      <div id="finalStroop">
-        <h2 id="tituloFinal">Fim do teste Stroop</h2>
-        <br />
-        <br />
-        <input type="button" class="pure-button pure-button-primary" value="Voltar ao início" onclick="voltar()" />
-      </div>
+  </div>
+
+  <div id="voltar" style="display: none">
+    <div id="finalStroop">
+      <h2 id="tituloFinal">Fim do teste Stroop</h2>
+      <br />
+      <br />
+      <input type="button" class="pure-button pure-button-primary" value="Voltar ao início" onclick="voltar()" />
     </div>
   </div>
 
@@ -185,7 +186,7 @@
 
   <!--*******************************************************************************************!-->
 
-  <div class="pure-form center-aligned" id="TesteINPACS" style="display: none" action="javascript:void(0);">
+  <div class="pure-form center-aligned" id="TesteINPACS" style="display: none">
     <div id="botoes" style="display: block">
       <p class="labelTeste" id="label-INPACS"></p>
       <form class="center-aligned" onsubmit="respostaINPACS(event.submitter.value)" action="javascript:void(0);">
