@@ -1,15 +1,12 @@
 var dataSet = [];
 var localStoreLigado = false;
 
-
 if (typeof(Storage) !== "undefined") {
     localStoreLigado = true;
     if (localStorage.getItem("dataSet") != null) {
         dataSet = JSON.parse(localStorage.dataSet);
     }
-
 }
-
 
 function enviarDados(dados) {
     dataSet.push(dados);
@@ -24,51 +21,76 @@ function limparDados() {
 
 var configs = getConfiguracoes();
 
-
-var NUM_DE_PERGUNTAS = 99999;//configs.perguntas;
-var NUM_DE_PERGUNTAS_PRE = 99999;//configs.perguntasPre;
+var NUM_DE_PERGUNTAS = 99999; // configs.perguntas;
+var NUM_DE_PERGUNTAS_PRE = 99999; // configs.perguntasPre;
+var numPerguntasINPACS = configs.perguntasINPACS;
 var ordemBateria = configs.ordemBateria;
 
-var contaPerguntas = 0;
-var ultimoCerto = 0;
-var t = 0;
+var contaPerguntas = 0, tUltimaResposta = 0, t = 0;
 var resposta;
-var data = {};
+var inpacsPreTeste = true;
+var data = { "respostaStroop": [], "respostaInpacsPre": [], "respostaInpacsPos": []};
 
-data.stringResposta = [];
+var tipoTeste = "INPACS";
+var testeAtual = 0; // Indica quantos testes ja foram feitos no total
+var testesSalvos = 0; // Indica quantos testes ja foram feitos e salvos ('C' e 'I')
 
-var testeAtual = 0; //Indica quantos testes ja foram feitos no total
-var testesSalvos = 0; //Indica quantos testes ja foram feitos e salvos ('C' e I)
+var tipoInpacs = configs.tipoInicioInpacs;
 
 var tempoRepouso = configs.tempoEntreTeste;
-
 var tempoRestanteRepouso = tempoRepouso;
 
-var intervalTempo; // Guarda o setInterval do tempo
+const teclasTeclado = {
+    "1": "vermelho", "2": "azul", "3": "verde", "4": "roxo", "5": "preto"
+}
+
+const cores = {
+    0: { texto: "vermelho", hex: "#ff0000" },
+    1: { texto: "verde", hex: "#11aa11" },
+    2: { texto: "azul",hex: "#0000ee" },
+    3: { texto: "roxo", hex: "#8F3099" },
+    4: { texto: "preto", hex: "#000000" }
+}
+
+const tiposTeste = {
+    "C": "Congruente",
+    "pC": "Teste Congruente",
+    "I": "Incongruente",
+    "pI": "Teste Incongruente"
+}
 
 document.addEventListener('keydown', function(event) {
     if (ordemBateria[testeAtual] != "F") {
-        if (event.keyCode == 49) {
-            clicou('vermelho');
-        } else if (event.keyCode == 50) {
-            clicou('azul');
-        } else if (event.keyCode == 51) {
-            clicou('verde');
-        } else if (event.keyCode == 52) {
-            clicou('roxo');
-        } else if (event.keyCode == 53) {
-            clicou('marrom');
+        if(event.key == "Escape") {
+            forceFim()
+            return
+        }
+        let cor = teclasTeclado[event.key]
+        if(cor !== undefined) {
+            respostaStroop(cor)
+            return
+        }
+
+        if(event.key === "ArrowLeft") {
+            cor = $("#opcao-1").val();
+        } else if(event.key === "ArrowRight") {
+            cor = $("#opcao-2").val();
+        }
+
+        if (cor !== undefined) {
+            respostaINPACS(cor)
         }
     }
 });
 
 function forceFim() {
-	document.getElementById("label").innerHTML = "Fim";
-	document.getElementById("conta").innerHTML = "...";
+	$("#label-Stroop").text("Fim");
+	$("#conta").text("...");
 
-	document.getElementById("conta").innerHTML = "";
-	document.getElementById("voltar").style.display = "inline";
+    $("#tituloFinal").text("Teste finalizado");
 
+	$("#conta").text("");
+	$("#voltar").css("display","inline");
 
 	var cont = 0;
 	var achados = 0;
@@ -88,117 +110,110 @@ function forceFim() {
 
 function repouso() {
     if (tempoRestanteRepouso > 0) {
-        var teste; // Nome do teste
-        if (ordemBateria[testeAtual] == "pC") {
-            teste = "Treino congruente";
-        } else if (ordemBateria[testeAtual] == "C") {
-            teste = "Congruente";
-        } else if (ordemBateria[testeAtual] == "pI") {
-            teste = "Treino incongruente";
-        } else if (ordemBateria[testeAtual] == "I") {
-            teste = "Incongruente";
-        } else {
-            teste = "Fim";
-        }
-        document.getElementById("label").innerHTML = teste;
-        document.getElementById("conta").innerHTML = "...";
-        setTimeout("repouso();", 1000);
+        let tipo = ordemBateria[testeAtual];
+
+        $(`#label-${tipoTeste}`).text(`A etapa com ${tipoTeste} vai começar`);
+        $("#conta").text("...");
+        setTimeout(() => repouso(), 1000);
     } else {
-        mudaCor(ordemBateria[testeAtual]);
-        intervalTempo = setInterval("tempo();", 10);
-        var string = "";
-        document.getElementById("botoes").style.display = "block";
-        document.getElementById("countdown").style.display = "none";
-        document.getElementById("conta").innerHTML = "Questão " + (contaPerguntas + 1);
+        if(tipoTeste == "INPACS") {
+            mudaCorInpacs()
+            $("#conta-inpacs").text(`Questão ${contaPerguntas + 1}`);
+        } else {
+            mudaCor(ordemBateria[testeAtual]);
+            $("#conta").text(`Questão ${contaPerguntas + 1}`);
+        }
+
+        $("#botoes").css("display", "block");
+        $("#countdown").css("display", "none")
     }
     tempoRestanteRepouso -= 1;
 }
 
 function iniciar() {
     document.getElementById("FormularioTutorial").style.display = "none";
-    document.getElementById("corpo").style.display = "inline";
-    data.nome = document.getElementById("nome").value;
 
-    var grupo = "Sem Grupo";
-    if (document.getElementById("grupo_1").checked) {
-        grupo = 1;
-    }
-    if (document.getElementById("grupo_2").checked) {
-        grupo = 2;
+    if(tipoTeste == "INPACS") {
+        document.getElementById("TesteINPACS").style.display = "block";
+        document.getElementById("TesteStroop").style.display = "none";
+    } else {
+        document.getElementById("TesteStroop").style.display = "block";
+        document.getElementById("TesteINPACS").style.display = "none";
     }
 
-    data.grupo = grupo;
     document.getElementById("countdown").style.display = "block";
-    setTimeout("contagem();", 0);
+
+    contaPerguntas = 0;
+    t = Date.now();
+    contagem();
     repouso();
 }
 
-function tutorial() {
+function finalizaINPACS() { 
+    tipoTeste = "Stroop";
+
+    if(inpacsPreTeste) {
+        iniciar()
+        inpacsPreTeste = false
+    } else {
+        console.log("Finalizado");
+        enviarDados(data);
+        $("#tituloFinal").text("Fim do teste");
+        $("#TesteStroop,#TesteINPACS").css("display","none");
+        $("#voltar").css("display","block");
+    }
+}
+
+function tutorial(form) {
     document.getElementById("FormularioNome").style.display = "none";
     document.getElementById("FormularioTutorial").style.display = "inline";
     document.getElementById("labelTutorialCongruente").style.color = "#11aa11";
-    document.getElementById("labelTutorialCongruente").innerHTML = "Verde";
+    $("#labelTutorialCongruente,#labelTutorialIncongruente").text("Verde");
     document.getElementById("labelTutorialIncongruente").style.color = "#ff0000";
-    document.getElementById("labelTutorialIncongruente").innerHTML = "Verde";
-    document.getElementById("respostaC").innerHTML = "Clique na resposta certa";
-    document.getElementById("respostaI").innerHTML = "Clique na resposta certa";
+    $("#respostaC,#respostaI").text("Clique na resposta certa");
+
+    data.nome = form.nome.value;
+    data.grupo = form.grupo.value;
 }
 
-function tempo() {
-    t += 0.01;
-}
-
-function clicouTutorialC(cor) {
-    if (cor == "verde") {
-        document.getElementById("respostaC").innerHTML = "Resposta certa";
-    } else {
-        document.getElementById("respostaC").innerHTML = "Resposta errada";
+function respostaTutorial(tipo, cor) {
+    let resultado
+    switch(tipo) {
+        case "C":
+            resultado = (cor == "verde") ? "certa" : "errada"
+            break
+        case "I":
+            resultado = (cor == "vermelho") ? "certa" : "errada"
+            break
     }
 
+    $(`#resposta${tipo}`).text(`Resposta ${resultado}`)
 }
 
-function clicouTutorialI(cor) {
-    if (cor == "vermelho") {
-        document.getElementById("respostaI").innerHTML = "Resposta certa";
-    } else {
-        document.getElementById("respostaI").innerHTML = "Resposta errada";
-    }
-
-}
-
-function clicou(cor) {
+function respostaStroop(cor) {
     if (tempoRestanteRepouso <= -1) {
 		if (contaPerguntas == 0) {
 			console.log("Começou");
-			setTimeout("forceFim();", 20 * 60 * 1000);
+			setTimeout(() => finalizaStroop(), 20 * 60e3); // 20 * 60s 
 		}
         contaPerguntas++; //COMECA DO 1
-        document.getElementById("conta").innerHTML = "Questão " + (contaPerguntas + 1);
+        $("#conta").text(`Questão ${(contaPerguntas + 1)}`);
 
         var limitePerguntas = NUM_DE_PERGUNTAS;
         if (ordemBateria[testeAtual] == "pI" || ordemBateria[testeAtual] == "pC") {
             limitePerguntas = NUM_DE_PERGUNTAS_PRE;
         }
 
-        if (contaPerguntas <= limitePerguntas) { //Se o teste ainda nao acabou
+        if (contaPerguntas <= limitePerguntas) { // Se o teste ainda nao acabou
             if (ordemBateria[testeAtual] == "I" || ordemBateria[testeAtual] == "C") {
-                var acertou = 0;
-                if (cor == resposta)
-                    acertou = 1;
-                else
-                    acertou = 0;
+                var acertou = (cor == resposta) ? 1 : 0;
 
+                var t_resp = (Date.now() - t);
 
-                var t_resp = t - ultimoCerto;
-                ultimoCerto = t;
+                if (data.respostaStroop[testesSalvos] == null)
+                    data.respostaStroop[testesSalvos] = [];
 
-                if (data.stringResposta[testesSalvos] == null)
-                    data.stringResposta[testesSalvos] = [];
-
-                data.stringResposta[testesSalvos][contaPerguntas - 1] = {};
-                data.stringResposta[testesSalvos][contaPerguntas - 1].acertou = acertou;
-                data.stringResposta[testesSalvos][contaPerguntas - 1].tempo = t_resp.toFixed(2);
-
+                data.respostaStroop[testesSalvos].push({ acertou, tempo: t_resp.toFixed(2)});
             }
             mudaCor(ordemBateria[testeAtual]);
         }
@@ -208,134 +223,169 @@ function clicou(cor) {
                 testesSalvos++;
             testeAtual++;
             if (ordemBateria[testeAtual] == "F") { //Se a bateria acabou
-
-                document.getElementById("conta").innerHTML = "";
-                document.getElementById("voltar").style.display = "inline";
-
-
-                var cont = 0;
-                var achados = 0;
-
-                while (ordemBateria[cont] != "F") {
-                    if (ordemBateria[cont] == "C" || ordemBateria[cont] == "I") {
-                        achados++;
-                    }
-                    cont++;
-                }
-
-                data.ordemBateria = ordemBateria;
-                enviarDados(data);
-                document.getElementById("botoes").innerHTML = "";
+                finalizaStroop()
             } else {
-                clearInterval(intervalTempo);
-                document.getElementById("label").style.color = "000000";
+                document.getElementById("label-Stroop").style.color = "000000";
 
-                contaPerguntas = 0;
-                ultimoCerto = 0;
-                t = 0;
-                resposta = "";
+                contaPerguntas = 0, tUltimaResposta = 0, t = 0, resposta = "";
+
                 tempoRestanteRepouso = tempoRepouso;
                 document.getElementById("countdown").style.display = "block";
-                setTimeout("contagem();", 0);
+                contagem()
                 repouso();
             }
         }
     }
 }
 
+function finalizaStroop(force = false) {
+
+    var cont = 0;
+    var achados = 0;
+
+    while (ordemBateria[cont] != "F") {
+        if (ordemBateria[cont] == "C" || ordemBateria[cont] == "I") {
+            achados++;
+        }
+        cont++;
+    }
+
+    contaPerguntas = 0;
+    tipoTeste = "INPACS";
+    data.ordemBateria = ordemBateria;
+    iniciar();
+}
+
 var lastChoice = -1;
 
 function mudaCor(c_i) {
-    var rand;
-    var rand2;
-    if (c_i == "C" || c_i == "pC") { // PRIMEIRA METADE É CONGRUENTE
+    var rand, rand2;
+
+    let tipo = Math.floor(Math.random() * 10) % 2 == 0 ? "C" : "I";
+
+    if (tipo == "C") { // CONGRUENTE
         rand = Math.floor(Math.random() * 5);
         if (rand == lastChoice) {
             rand = (rand + 1) % 5;
         }
         lastChoice = rand;
-        switch (rand) {
-            case 0: // VERMELHO
-                document.getElementById("label").style.color = "#ff0000";
-                document.getElementById("label").innerHTML = "Vermelho";
-                resposta = "vermelho";
-                break;
-            case 1: //VERDE
-                document.getElementById("label").style.color = "#11aa11";
-                document.getElementById("label").innerHTML = "Verde";
-                resposta = "verde";
-                break;
-            case 2: // AZUL
-                document.getElementById("label").style.color = "#0000ee";
-                document.getElementById("label").innerHTML = "Azul";
-                resposta = "azul";
-                break;
-            case 3: // ROXO
-                document.getElementById("label").style.color = "#8F3099";
-                document.getElementById("label").innerHTML = "Roxo";
-                resposta = "roxo";
-                break;
-            case 4:
-                document.getElementById("label").style.color = "#000000";
-                document.getElementById("label").innerHTML = "Preto";
-                resposta = "marrom";
-                break;
-        }
-    } else { // SEGUNDA METADE É INCONGRUENTE
+        let cor = cores[rand];
+
+        $("#label-Stroop").css("color", cor.hex).text(cor.texto);
+        
+        resposta = cor.texto;
+    } else { // INCONGRUENTE
         rand = Math.floor(Math.random() * 5);
         if (rand == lastChoice) {
             rand = (rand + 1) % 5;
         }
         lastChoice = rand;
-        switch (rand) {
-            case 0: // VERMELHO
-                document.getElementById("label").style.color = "#ff0000";
-                resposta = "vermelho";
-                break;
-            case 1: //VERDE
-                document.getElementById("label").style.color = "#11aa11";
-                resposta = "verde";
-                break;
-            case 2: // AZUL
-                document.getElementById("label").style.color = "#0000ee";
-                resposta = "azul";
-                break;
-            case 3: // ROXO
-                document.getElementById("label").style.color = "#8F3099";
-                resposta = "roxo";
-                break;
-            case 4: //MARROM
-                document.getElementById("label").style.color = "#000000";
-                resposta = "marrom";
-                break;
-        }
+        let cor = cores[rand]
+
+        resposta = cor.texto;
+        $("#label-Stroop").css("color", cor.hex);
+
         do {
             rand2 = (Math.floor(Math.random() * 5)) % 5;
         } while (rand2 == rand);
 
-        switch (rand2) {
-            case 0: // VERMELHO
-                document.getElementById("label").innerHTML = "Vermelho";
-                break;
-            case 1: //VERDE
-                document.getElementById("label").innerHTML = "Verde";
-                break;
-            case 2: // AZUL
-                document.getElementById("label").innerHTML = "Azul";
-                break;
-            case 3: //ROXO
-                document.getElementById("label").innerHTML = "Roxo";
-                break;
-            case 4: // MARROM
-                document.getElementById("label").innerHTML = "Preto";
-                break;
+        let corIncongruente = cores[rand2]
+
+        $("#label-Stroop").text(corIncongruente.texto);
+    }
+
+    t = Date.now();
+}
+
+function mudaCorInpacs() {
+
+    if (contaPerguntas > 0 && contaPerguntas % 15 == 0) {
+        tipoInpacs = tipoInpacs == "I" ? "C" : "I"
+    }
+
+    $("#conta-inpacs").text(`Questão ${(contaPerguntas + 1)}`);
+
+    if (tipoInpacs == "I") {
+        rand = Math.floor(Math.random() * 5);
+        if (rand == lastChoice) {
+            rand = (rand + 1) % 5;
         }
+        lastChoice = rand;
+        let cor = cores[rand];
+
+        resposta = cor.texto;
+
+        let botao =  1 + Math.floor(Math.random() * 2);
+
+        $("#label-INPACS").css("color", cor.hex);
+        $(`#opcao-${botao}`).text(cor.texto).val(cor.texto);
+
+        do {
+            rand2 = (Math.floor(Math.random() * 5)) % 5;
+        } while (rand2 == rand);
+        cor2 = cores[rand2];
+
+        $("#label-INPACS").text(cor2.texto);
+
+        do {
+            rand2 = (Math.floor(Math.random() * 5)) % 5;
+        } while (cores[rand2].texto == cor.texto);
+        
+        cor2 = cores[rand2];
+
+        $(`#opcao-${botao == 1 ? 2 : 1}`).text(cor2.texto).val(cor2.texto);
+    } else {
+        rand = Math.floor(Math.random() * 5);
+        if (rand == lastChoice) {
+            rand = (rand + 1) % 5;
+        }
+        lastChoice = rand;
+        let cor = cores[rand];
+
+        resposta = cor.texto;
+
+        let botao =  1 + Math.floor(Math.random() * 2);
+
+        $("#label-INPACS").css("color", cor.hex).text(cor.texto);
+        $(`#opcao-${botao}`).text(cor.texto).val(cor.texto);
+
+        do {
+            rand2 = (Math.floor(Math.random() * 5)) % 5;
+        } while (cores[rand2].texto == cor.texto);
+        
+        cor2 = cores[rand2];
+
+        $(`#opcao-${botao == 1 ? 2 : 1}`).text(cor2.texto).val(cor2.texto);
+    }
+
+    t = Date.now();
+}
+
+function respostaINPACS(cor) {
+    contaPerguntas++;
+
+    var acertou = (cor == resposta) ? 1 : 0;
+    var t_resp = (Date.now() - t);
+
+    let conjunto = inpacsPreTeste ? "respostaInpacsPre" : "respostaInpacsPos"
+
+    if (data[conjunto].length == 0 || data[conjunto][data[conjunto].length - 1].length % 15 == 0) {
+        data[conjunto].push([])
+    }
+
+    data[conjunto][data[conjunto].length-1].push({ acertou, tempo: t_resp.toFixed(2), tipo: tipoInpacs == "I" ? "Incongruente" : "Congruente"});
+
+    if(contaPerguntas == numPerguntasINPACS) {
+        finalizaINPACS()
+    } else {
+        mudaCorInpacs()
     }
 }
 
 function voltar() {
     document.location.href = "index.html";
 }
+
 // Relogio de contagem regressiva
 function contagem() {
     var countdown = $("#countdown").countdown360({
@@ -348,12 +398,9 @@ function contagem() {
         autostart: false,
         label: ["", ""],
         smooth: true,
-        onComplete: function() {
-            /*console.log('done')*/ ;
-        }
+        onComplete: () => {}
     });
     countdown.start();
-    //console.log('countdown360 ',countdown);
 
     $("#countdown").css("left", window.innerWidth * 0.5 - countdown.settings.radius - countdown.settings.strokeWidth);
 
@@ -362,12 +409,6 @@ function contagem() {
     } else {
         $("#countdown").css("bottom", 0);
     }
-
-    // $("#countdown360_countdown").css("position", "fixed");
-    // $("#countdown360_countdown").css("botton", 0);
-
-    // this.settings.width = (this.settings.radius * 2) + (this.settings.strokeWidth * 2);
-    // this.settings.height = this.settings.width;
 
     // Nao sei por que buga as vezes e o relogio vira um quadrado
     $(window).resize(function() {

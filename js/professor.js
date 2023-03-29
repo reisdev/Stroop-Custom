@@ -104,7 +104,7 @@ function abre_informacao_teste(obj) {
 
 
 	//Para cada resposta de cada teste
-	for (var i = 0; i < dados[1 * obj.getAttribute("id_teste")].stringResposta.length; i++) {
+	for (var i = 0; i < dados[1 * obj.getAttribute("id_teste")].respostaStroop.length; i++) {
 		obj.innerHTML += "<br>"
 
 		if (ordemFiltrada[i] == "C")
@@ -116,24 +116,24 @@ function abre_informacao_teste(obj) {
 		var mediaC = 0;
 		var mediaI = 0;
 		var acertos = 0;
-		for (var j = 0; j < dados[1 * obj.getAttribute("id_teste")].stringResposta[i].length; j++) {
+		for (var j = 0; j < dados[1 * obj.getAttribute("id_teste")].respostaStroop[i].length; j++) {
 			/*Escreve na tela ( em forma de botões ) se a pessoa acertou, e o seu tempo, alterando a classe de cada uma para :
 				- spanAcertou
 				- spanErrou
 			 */
 
-			if (dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].acertou == "1") {
-				obj.innerHTML += "<span class=spanAcertou>" + dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo + "</span><br>";
+			if (dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].acertou == "1") {
+				obj.innerHTML += "<span class=spanAcertou>" + dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo + "</span><br>";
 				if (ordemFiltrada[i] == "C") {
-					mediaC = parseFloat(mediaC) + parseFloat(dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo);
+					mediaC = parseFloat(mediaC) + parseFloat(dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo);
 				}
 				else {
-					mediaI = parseFloat(mediaI) + parseFloat(dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo);
+					mediaI = parseFloat(mediaI) + parseFloat(dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo);
 				}
 				acertos++;
 			}
 			else {
-				obj.innerHTML += "<span class=spanErrou>" + dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo + "</span><br>";
+				obj.innerHTML += "<span class=spanErrou>" + dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo + "</span><br>";
 			}
 
 		}
@@ -148,21 +148,21 @@ function abre_informacao_teste(obj) {
 			obj.innerHTML += "<span class=spanAcertou>" + parseFloat(mediaI.toFixed(2)) + "</span><br>";
 		}
 		desvioPadrao = 0;
-		for (var j = 0; j < dados[1 * obj.getAttribute("id_teste")].stringResposta[i].length; j++) {
+		for (var j = 0; j < dados[1 * obj.getAttribute("id_teste")].respostaStroop[i].length; j++) {
 			if (mediaI == 0) {
-				quadrado = ((parseFloat(dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo)) - parseFloat(mediaC)) * (parseFloat(parseFloat(dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo) - parseFloat(mediaC)));
+				quadrado = ((parseFloat(dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo)) - parseFloat(mediaC)) * (parseFloat(parseFloat(dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo) - parseFloat(mediaC)));
 				desvioPadrao = parseFloat(desvioPadrao) + quadrado;
 			}
 			else {
-				desvioPadrao = parseFloat(desvioPadrao) + ((parseFloat(parseFloat(dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo)) - parseFloat(mediaI)) * (parseFloat(parseFloat(dados[1 * obj.getAttribute("id_teste")].stringResposta[i][j].tempo)) - parseFloat(mediaI)));
+				desvioPadrao = parseFloat(desvioPadrao) + ((parseFloat(parseFloat(dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo)) - parseFloat(mediaI)) * (parseFloat(parseFloat(dados[1 * obj.getAttribute("id_teste")].respostaStroop[i][j].tempo)) - parseFloat(mediaI)));
 			}
 		}
-		desvioPadrao = parseFloat(desvioPadrao) / parseFloat(dados[1 * obj.getAttribute("id_teste")].stringResposta[i].length);
+		desvioPadrao = parseFloat(desvioPadrao) / parseFloat(dados[1 * obj.getAttribute("id_teste")].respostaStroop[i].length);
 		desvioPadrao = parseFloat(Math.sqrt(parseFloat(desvioPadrao)));
 		obj.innerHTML += "<br>Desvio Padrão<br>";
 		obj.innerHTML += "<span class=spanAcertou>" + parseFloat(desvioPadrao.toFixed(2)) + "</span><br>";
 
-		if (j < dados[1 * obj.getAttribute("id_teste")].stringResposta[i].length - 1)
+		if (j < dados[1 * obj.getAttribute("id_teste")].respostaStroop[i].length - 1)
 			obj.innerHTML += "<br>";
 	}
 
@@ -207,14 +207,14 @@ function plotaGraficoX(/*vetX,vetY */indice, idHTML, grafico) {
 		var auxVetX = [];
 		var rgb = [];
 		// var colorAux = 10;
-		for (j = 0; j < dados[i].stringResposta[indice].length; j++) {
-			if (dados[i].stringResposta[indice][j].acertou) { // Acertou
+		for (j = 0; j < dados[i].respostaStroop[indice].length; j++) {
+			if (dados[i].respostaStroop[indice][j].acertou) { // Acertou
 				auxVetX.push(j + 1);
-				auxVetY.push(dados[i].stringResposta[indice][j].tempo);
+				auxVetY.push(dados[i].respostaStroop[indice][j].tempo);
 				rgb.push('rgb(31,119,180)');
 			} else {
 				auxVetX.push(j + 1);
-				auxVetY.push(dados[i].stringResposta[indice][j].tempo);
+				auxVetY.push(dados[i].respostaStroop[indice][j].tempo);
 				rgb.push('rgb(180,30,31)');
 			}
 		}
@@ -277,7 +277,6 @@ function plotaGraficoX(/*vetX,vetY */indice, idHTML, grafico) {
 function plotaGraficoMedia(graficoGlobal, indice, idHTML, grafico) {
 
 	var vetLinhas = [];
-
 	var media = [];
 	var acertos = [];
 	var acertosAbsolutos = 0;
@@ -385,8 +384,6 @@ function geraGraficos() {
 
 	var congruentes = 0;
 	var incongruentes = 0;
-	var graficoGlobalC = [];
-	var graficoGlobalI = [];
 	var grupos = [];
 
 	for (var i = 0; i < dados.length; i++) {
@@ -396,36 +393,24 @@ function geraGraficos() {
 	}
 
 	for (var m = 0; m < grupos.length; m++) {
-		for (var j = 0; j < dados.length; j++) {
-			if (dados[j].grupo == grupos[m]) {
-				congruentes = 0;
-				incongruentes = 0;
-				for (var i = 0; i < dados[0].ordemBateria.length; i++) {
-					if (dados[0].ordemBateria[i] == "C") {
-						graficoGlobalC.push(dados[j].stringResposta[congruentes + incongruentes]);
-						congruentes++;
-					}
-					if (dados[0].ordemBateria[i] == "I") {
-						graficoGlobalI.push(dados[j].stringResposta[congruentes + incongruentes]);
-						incongruentes++;
-					}
-				}
-			}
+
+		let dadosGrupo = dados.filter((g) => g.grupo == grupos[m]);
+
+		let dadosCongruentes = dadosGrupo
+									.filter((value,i) => dados[0].ordemBateria[i] == "C")
+									.flatMap((d) => d.respostaStroop);
+									
+		let dadosIncongruentes = dadosGrupo
+									.filter((value,i) => dados[0].ordemBateria[i] == "I")
+									.flatMap((d) => d.respostaStroop);
+
+		if (dadosCongruentes.length > 0) {
+			plotaGraficoMedia(dadosCongruentes, dadosCongruentes.length, "Media Congruente do grupo " + (grupos[m]), "graficoCMedia");
 		}
-
-		if (congruentes)
-			plotaGraficoMedia(graficoGlobalC, congruentes, "Media Congruente do grupo " + (grupos[m]), "graficoCMedia");
-		if (incongruentes)
-			plotaGraficoMedia(graficoGlobalI, incongruentes, "Media Incongruente do grupo " + (grupos[m]), "graficoIMedia");
-
-		congruentes = 0;
-		incongruentes = 0;
-		graficoGlobalC = [];
-		graficoGlobalI = [];
+		if (dadosIncongruentes.length > 0) {
+			plotaGraficoMedia(dadosIncongruentes, dadosIncongruentes.length, "Media Incongruente do grupo " + (grupos[m]), "graficoIMedia");
+		}
 	}
-
-
-
 
 	for (var i = 0; i < dados[0].ordemBateria.length; i++) {
 		if (dados[0].ordemBateria[i] == "C") {
