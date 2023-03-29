@@ -25,7 +25,7 @@ var NUM_DE_PERGUNTAS = 99999;//configs.perguntas;
 var NUM_DE_PERGUNTAS_PRE = 99999;//configs.perguntasPre;
 var ordemBateria = configs.ordemBateria;
 
-var contaPerguntas = 0, ultimoCerto = 0, t = 0;
+var contaPerguntas = 0, tUltimaResposta = 0, t = 0;
 var resposta;
 var data = {};
 
@@ -36,7 +36,6 @@ var testesSalvos = 0; //Indica quantos testes ja foram feitos e salvos ('C' e 'I
 
 var tempoRepouso = configs.tempoEntreTeste;
 var tempoRestanteRepouso = tempoRepouso;
-var intervalTempo; // Guarda o setInterval do tempo
 
 const teclasTeclado = {
     "1": "vermelho", "2": "azul", "3": "verde", "4": "roxo", "5": "preto"
@@ -62,7 +61,7 @@ document.addEventListener('keydown', function(event) {
         if(event.key == "Escape") {
             finalizaStroop(force = true)
             return
-        } 
+        }
         let cor = teclasTeclado[event.key]
 
         if(cor !== null) {
@@ -102,10 +101,9 @@ function repouso() {
 
         $("#label").text(nomeTeste);
         $("#conta").text("...");
-        setTimeout("repouso();", 1000);
+        setTimeout(() => repouso(), 1000);
     } else {
         mudaCor(ordemBateria[testeAtual]);
-        intervalTempo = setInterval("tempo();", 10);
 
         $("#botoes").css("display", "block");
         $("#countdown").css("display", "none")
@@ -129,7 +127,9 @@ function iniciar() {
 
     data.grupo = grupo;
     document.getElementById("countdown").style.display = "block";
-    setTimeout("contagem();", 0);
+
+    t = Date.now();
+    contagem();
     repouso();
 }
 
@@ -144,10 +144,6 @@ function tutorial() {
     $("#labelTutorialCongruente,#labelTutorialIncongruente").text("Verde");
     document.getElementById("labelTutorialIncongruente").style.color = "#ff0000";
     $("#respostaC,#respostaI").text("Clique na resposta certa");
-}
-
-function tempo() {
-    t += 0.01;
 }
 
 function respostaTutorial(tipo, cor) {
@@ -168,7 +164,7 @@ function respostaStroop(cor) {
     if (tempoRestanteRepouso <= -1) {
 		if (contaPerguntas == 0) {
 			console.log("Começou");
-			setTimeout("forceFim();", 20 * 60e3); // 20 * 60s 
+			setTimeout(() => forceFim(), 20 * 60e3); // 20 * 60s 
 		}
         contaPerguntas++; //COMECA DO 1
         $("#conta").text(`Questão ${(contaPerguntas + 1)}`);
@@ -178,12 +174,11 @@ function respostaStroop(cor) {
             limitePerguntas = NUM_DE_PERGUNTAS_PRE;
         }
 
-        if (contaPerguntas <= limitePerguntas) { //Se o teste ainda nao acabou
+        if (contaPerguntas <= limitePerguntas) { // Se o teste ainda nao acabou
             if (ordemBateria[testeAtual] == "I" || ordemBateria[testeAtual] == "C") {
                 var acertou = (cor == resposta) ? 1 : 0;
 
-                var t_resp = t - ultimoCerto;
-                ultimoCerto = t;
+                var t_resp = (Date.now() - t) / 1e3;
 
                 if (data.stringResposta[testesSalvos] == null)
                     data.stringResposta[testesSalvos] = [];
@@ -203,11 +198,11 @@ function respostaStroop(cor) {
                 clearInterval(intervalTempo);
                 document.getElementById("label").style.color = "000000";
 
-                contaPerguntas = 0, ultimoCerto = 0, t = 0, resposta = "";
+                contaPerguntas = 0, tUltimaResposta = 0, t = 0, resposta = "";
 
                 tempoRestanteRepouso = tempoRepouso;
                 document.getElementById("countdown").style.display = "block";
-                setTimeout("contagem();", 0);
+                setTimeout(() => contagem(), 0);
                 repouso();
             }
         }
@@ -240,7 +235,9 @@ var lastChoice = -1;
 function mudaCor(c_i) {
     var rand, rand2;
 
-    if (c_i == "C" || c_i == "pC") { // PRIMEIRA METADE É CONGRUENTE
+    let tipo = Math.floor(Math.random() * 10) % 2 == 0 ? "C" : "I";
+
+    if (tipo == "C") { // CONGRUENTE
         rand = Math.floor(Math.random() * 5);
         if (rand == lastChoice) {
             rand = (rand + 1) % 5;
@@ -248,10 +245,10 @@ function mudaCor(c_i) {
         lastChoice = rand;
         let cor = coresStroop[rand];
 
-        $("#label").css("color",cor.hex).text(cor.texto);
+        $("#label").css("color", cor.hex).text(cor.texto);
         
-        resposta = cor.nome;
-    } else { // SEGUNDA METADE É INCONGRUENTE
+        resposta = cor.texto;
+    } else { // INCONGRUENTE
         rand = Math.floor(Math.random() * 5);
         if (rand == lastChoice) {
             rand = (rand + 1) % 5;
@@ -259,8 +256,8 @@ function mudaCor(c_i) {
         lastChoice = rand;
         let cor = coresStroop[rand]
 
-        $("#label").css("color",cor.hex);
         resposta = cor.texto;
+        $("#label").css("color", cor.hex);
 
         do {
             rand2 = (Math.floor(Math.random() * 5)) % 5;
@@ -270,6 +267,8 @@ function mudaCor(c_i) {
 
         $("#label").text(corIncongruente.texto);
     }
+
+    t = Date.now();
 }
 
 function mudaCorInpacs() {
