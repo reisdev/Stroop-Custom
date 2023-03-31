@@ -110,9 +110,7 @@ function forceFim() {
 
 function repouso() {
     if (tempoRestanteRepouso > 0) {
-        let tipo = ordemBateria[testeAtual];
-
-        $(`#label-${tipoTeste}`).text(`A etapa com ${tipoTeste} vai começar`);
+        $(`#label-${tipoTeste}`).text(`A etapa de avaliação vai começar`);
         $("#conta").text("...");
         setTimeout(() => repouso(), 1000);
     } else {
