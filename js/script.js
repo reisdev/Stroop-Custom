@@ -28,10 +28,9 @@ var ordemBateria = configs.ordemBateria;
 
 var contaPerguntas = 0, tUltimaResposta = 0, t = 0;
 var resposta;
-var inpacsPreTeste = true;
 var data = { "respostaStroop": [], "respostaInpacsPre": [], "respostaInpacsPos": []};
 
-var tipoTeste = "INPACS";
+var tipoTeste = "escolha";
 var testeAtual = 0; // Indica quantos testes ja foram feitos no total
 var testesSalvos = 0; // Indica quantos testes ja foram feitos e salvos ('C' e 'I')
 
@@ -61,24 +60,27 @@ const tiposTeste = {
 
 document.addEventListener('keydown', function(event) {
     if (ordemBateria[testeAtual] != "F") {
-        if(event.key == "Escape") {
-            forceFim()
-            return
-        }
-        let cor = teclasTeclado[event.key]
-        if(cor !== undefined) {
-            respostaStroop(cor)
-            return
-        }
-
-        if(event.key === "ArrowLeft") {
-            cor = $("#opcao-1").val();
-        } else if(event.key === "ArrowRight") {
-            cor = $("#opcao-2").val();
-        }
-
-        if (cor !== undefined) {
-            respostaINPACS(cor)
+        let cor;
+        switch(event.key) {
+            case "Escape":
+                forceFim()
+                break;
+            case "1":
+            case "2":
+            case "3":
+            case "4":
+            case "5":
+                cor = teclasTeclado[event.key]
+                respostaStroop(cor);
+                break;
+            case "ArrowLeft":
+                cor = $("#opcao-1").val();
+                respostaINPACS(cor);
+                break;
+            case "ArrowRight":
+                cor = $("#opcao-2").val();
+                respostaINPACS(cor);
+                break;
         }
     }
 });
@@ -114,7 +116,7 @@ function repouso() {
         $("#conta").text("...");
         setTimeout(() => repouso(), 1000);
     } else {
-        if(tipoTeste == "INPACS") {
+        if(tipoTeste.startsWith("INPACS")) {
             mudaCorInpacs()
             $("#conta-inpacs").text(`Questão ${contaPerguntas + 1}`);
         } else {
@@ -129,30 +131,49 @@ function repouso() {
 }
 
 function iniciar() {
-    document.getElementById("FormularioTutorial").style.display = "none";
+    if(tipoTeste == "escolha") {
+        $("#FormularioTutorial").css("display","none");
+        $("#EscolhaTeste").css("display","block");
+        return
+    }
 
-    if(tipoTeste == "INPACS") {
-        document.getElementById("TesteINPACS").style.display = "block";
-        document.getElementById("TesteStroop").style.display = "none";
+    if(tipoTeste.startsWith("INPACS")) {
+        $("#TesteStroop").css("display", "none");
+        $("#TesteINPACS").css("display","block");
     } else {
-        document.getElementById("TesteStroop").style.display = "block";
-        document.getElementById("TesteINPACS").style.display = "none";
+        $("#TesteINPACS").css("display", "none");
+        $("#TesteStroop").css("display", "block");
     }
 
     document.getElementById("countdown").style.display = "block";
-
     contaPerguntas = 0;
     t = Date.now();
     contagem();
     repouso();
 }
 
-function finalizaINPACS() { 
-    tipoTeste = "Stroop";
+function escolhaTeste(tipo) {
+    $("#EscolhaTeste").css("display","none");
 
-    if(inpacsPreTeste) {
+    switch(tipo) {
+        case "completo":
+            tipoTeste = "INPACS-pre";
+            break;
+        case "stroop":
+            tipoTeste = "Stroop-single";
+            break;
+        case "inpacs":
+            tipoTeste = "INPACS-single";
+            break;
+    }
+
+    iniciar();
+}
+
+function finalizaINPACS() { 
+    if(tiposTeste="INPACS-pre") {
+        tipoTeste = "Stroop";
         iniciar()
-        inpacsPreTeste = false
     } else {
         console.log("Finalizado");
         enviarDados(data);
@@ -237,7 +258,6 @@ function respostaStroop(cor) {
 }
 
 function finalizaStroop(force = false) {
-
     var cont = 0;
     var achados = 0;
 
@@ -249,9 +269,17 @@ function finalizaStroop(force = false) {
     }
 
     contaPerguntas = 0;
-    tipoTeste = "INPACS";
     data.ordemBateria = ordemBateria;
-    iniciar();
+    if(tipoTeste == "INPACS-pre") {
+        tipoTeste = "Stroop";
+        iniciar();
+    } else {
+        console.log("Finalizado");
+        enviarDados(data);
+        $("#tituloFinal").text("Fim do teste");
+        $("#TesteStroop,#TesteINPACS").css("display", "none");
+        $("#voltar").css("display", "block");
+    }
 }
 
 var lastChoice = -1;
@@ -365,7 +393,7 @@ function respostaINPACS(cor) {
     var acertou = (cor == resposta) ? 1 : 0;
     var t_resp = (Date.now() - t);
 
-    let conjunto = inpacsPreTeste ? "respostaInpacsPre" : "respostaInpacsPos"
+    let conjunto = ["INPACS-pre","INPACS-single"].includes(tipoTeste) ? "respostaInpacsPre" : "respostaInpacsPos"
 
     if (data[conjunto].length == 0 || data[conjunto][data[conjunto].length - 1].length % 15 == 0) {
         data[conjunto].push([])

@@ -84,6 +84,7 @@
   </div>
 
   <!--*******************************************************************************************!-->
+
   <div id="FormularioTutorial" style="display: none">
     <div class="pure-form" id="tutorial">
       <div style="text-align: center">
@@ -149,6 +150,19 @@
       </div>
       <br><br>
     </div>
+  </div>
+
+  <!--*******************************************************************************************!-->
+
+  <div class="pure-form center-aligned" id="EscolhaTeste" style="display:none">
+    <p><b>Escolha o teste desejado</b></p>
+    <form onsubmit="escolhaTeste(event.submitter.value)" action="javascript:void(0);">
+      <div id="botoes">
+        <button type="submit" class="pure-button" value="completo">Completo</button>
+        <button type="submit" class="pure-button" value="stroop">Stroop</button>
+        <button type="submit" class="pure-button" value="inpacs">INPACS</button>
+      </div>
+    </form>
   </div>
 
   <!--*******************************************************************************************!-->

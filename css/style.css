@@ -166,7 +166,7 @@ body {
   justify-content: center;
 }
 
-#FormularioNome {
+#FormularioNome, #EscolhaTeste {
   display: flex;
   flex-direction: row;
   background: white;
