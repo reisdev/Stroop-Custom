@@ -171,7 +171,7 @@ function escolhaTeste(tipo) {
 }
 
 function finalizaINPACS() { 
-    if(tiposTeste="INPACS-pre") {
+    if(tiposTeste == "INPACS-pre") {
         tipoTeste = "Stroop";
         iniciar()
     } else {
