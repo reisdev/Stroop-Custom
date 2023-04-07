@@ -270,15 +270,15 @@ function finalizaStroop(force = false) {
 
     contaPerguntas = 0;
     data.ordemBateria = ordemBateria;
-    if(tipoTeste == "INPACS-pre") {
-        tipoTeste = "Stroop";
-        iniciar();
-    } else {
+    if(tipoTeste == "Stroop-single") {
         console.log("Finalizado");
         enviarDados(data);
         $("#tituloFinal").text("Fim do teste");
         $("#TesteStroop,#TesteINPACS").css("display", "none");
         $("#voltar").css("display", "block");
+    } else {
+        tipoTeste = "INPACS-pos";
+        iniciar();
     }
 }
 
