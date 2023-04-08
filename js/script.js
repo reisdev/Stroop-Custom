@@ -144,7 +144,7 @@ function iniciar() {
         $("#TesteStroop").css("display", "none");
         $("#TesteINPACS").css("display", "block");
     } else {
-        setTimeout(finalizaStroop, 0.5 * 60e3); // 20 * 60s 
+        setTimeout(finalizaStroop, 20 * 60e3); // 20 * 60s 
 
         $("#TesteINPACS").css("display", "none");
         $("#TesteStroop").css("display", "block");
