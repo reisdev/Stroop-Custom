@@ -1,7 +1,7 @@
 var dataSet = [];
 var localStoreLigado = false;
 
-if (typeof(Storage) !== "undefined") {
+if (typeof (Storage) !== "undefined") {
     localStoreLigado = true;
     if (localStorage.getItem("dataSet") != null) {
         dataSet = JSON.parse(localStorage.dataSet);
@@ -28,7 +28,7 @@ var ordemBateria = configs.ordemBateria;
 
 var contaPerguntas = 0, tUltimaResposta = 0, t = 0;
 var resposta;
-var data = { "respostaStroop": [], "respostaInpacsPre": [], "respostaInpacsPos": []};
+var data = { "respostaStroop": [], "respostaInpacsPre": [], "respostaInpacsPos": [] };
 
 var tipoTeste = "escolha";
 var testeAtual = 0; // Indica quantos testes ja foram feitos no total
@@ -46,7 +46,7 @@ const teclasTeclado = {
 const cores = {
     0: { texto: "vermelho", hex: "#ff0000" },
     1: { texto: "verde", hex: "#11aa11" },
-    2: { texto: "azul",hex: "#0000ee" },
+    2: { texto: "azul", hex: "#0000ee" },
     3: { texto: "roxo", hex: "#8F3099" },
     4: { texto: "preto", hex: "#000000" }
 }
@@ -58,10 +58,10 @@ const tiposTeste = {
     "pI": "Teste Incongruente"
 }
 
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function (event) {
     if (ordemBateria[testeAtual] != "F") {
         let cor;
-        switch(event.key) {
+        switch (event.key) {
             case "Escape":
                 forceFim()
                 break;
@@ -86,76 +86,84 @@ document.addEventListener('keydown', function(event) {
 });
 
 function forceFim() {
-	$("#label-Stroop").text("Fim");
-	$("#conta").text("...");
+    $("#label-Stroop").text("Fim");
+    $("#conta").text("...");
 
     $("#tituloFinal").text("Teste finalizado");
 
-	$("#conta").text("");
-	$("#voltar").css("display","inline");
+    $("#conta").text("");
+    $("#voltar").css("display", "inline");
 
-	var cont = 0;
-	var achados = 0;
+    var cont = 0;
+    var achados = 0;
 
-	while (ordemBateria[cont] != "F") {
-		if (ordemBateria[cont] == "C" || ordemBateria[cont] == "I") {
-			achados++;
-		}
-		cont++;
-	}
+    while (ordemBateria[cont] != "F") {
+        if (ordemBateria[cont] == "C" || ordemBateria[cont] == "I") {
+            achados++;
+        }
+        cont++;
+    }
 
-	data.ordemBateria = ordemBateria;
-	enviarDados(data);
-	document.getElementById("botoes").innerHTML = "";
-	console.log("Fim");
+    data.ordemBateria = ordemBateria;
+    enviarDados(data);
+    document.getElementById("botoes").innerHTML = "";
+    console.log("Fim");
 }
 
 function repouso() {
+    let nomeTeste = tipoTeste.split("-")[0];
+
     if (tempoRestanteRepouso > 0) {
-        $(`#label-${tipoTeste}`).text(`A etapa de avaliação vai começar`);
-        $("#conta").text("...");
+        $(`#label-${nomeTeste}`).text(`A etapa de avaliação vai começar`).css("color","black");
+        $(`#conta-${nomeTeste}`).text("...");
         setTimeout(() => repouso(), 1000);
     } else {
-        if(tipoTeste.startsWith("INPACS")) {
+        $(`#conta-${nomeTeste}`).text(`Questão ${contaPerguntas + 1}`);
+
+        if (nomeTeste == "INPACS") {
             mudaCorInpacs()
-            $("#conta-inpacs").text(`Questão ${contaPerguntas + 1}`);
         } else {
             mudaCor(ordemBateria[testeAtual]);
-            $("#conta").text(`Questão ${contaPerguntas + 1}`);
         }
 
         $("#botoes").css("display", "block");
-        $("#countdown").css("display", "none")
+        $("#countdown").css("display", "none");
+        return
     }
     tempoRestanteRepouso -= 1;
 }
 
 function iniciar() {
-    if(tipoTeste == "escolha") {
-        $("#FormularioTutorial").css("display","none");
-        $("#EscolhaTeste").css("display","block");
+    if (tipoTeste == "escolha") {
+        $("#FormularioTutorial").css("display", "none");
+        $("#EscolhaTeste").css("display", "block");
         return
     }
 
-    if(tipoTeste.startsWith("INPACS")) {
+    if (tipoTeste.startsWith("INPACS")) {
         $("#TesteStroop").css("display", "none");
-        $("#TesteINPACS").css("display","block");
+        $("#TesteINPACS").css("display", "block");
     } else {
+        setTimeout(finalizaStroop, 0.5 * 60e3); // 20 * 60s 
+
         $("#TesteINPACS").css("display", "none");
         $("#TesteStroop").css("display", "block");
     }
 
-    document.getElementById("countdown").style.display = "block";
+    $("#countdown").css("display", "block");
+
     contaPerguntas = 0;
+    tempoRestanteRepouso = tempoRepouso;
+
     t = Date.now();
     contagem();
     repouso();
 }
 
 function escolhaTeste(tipo) {
-    $("#EscolhaTeste").css("display","none");
+    $("#EscolhaTeste").css("display", "none");
 
-    switch(tipo) {
+    switch (tipo) {
         case "completo":
             tipoTeste = "INPACS-pre";
             break;
@@ -170,16 +178,16 @@ function escolhaTeste(tipo) {
     iniciar();
 }
 
-function finalizaINPACS() { 
-    if(tiposTeste == "INPACS-pre") {
+function finalizaINPACS() {
+    if (tipoTeste == "INPACS-pre") {
         tipoTeste = "Stroop";
         iniciar()
     } else {
         console.log("Finalizado");
         enviarDados(data);
         $("#tituloFinal").text("Fim do teste");
-        $("#TesteStroop,#TesteINPACS").css("display","none");
-        $("#voltar").css("display","block");
+        $("#TesteStroop,#TesteINPACS").css("display", "none");
+        $("#voltar").css("display", "block");
     }
 }
 
@@ -197,7 +205,7 @@ function tutorial(form) {
 
 function respostaTutorial(tipo, cor) {
     let resultado
-    switch(tipo) {
+    switch (tipo) {
         case "C":
             resultado = (cor == "verde") ? "certa" : "errada"
             break
@@ -210,49 +218,47 @@ function respostaTutorial(tipo, cor) {
 }
 
 function respostaStroop(cor) {
-    if (tempoRestanteRepouso <= -1) {
-		if (contaPerguntas == 0) {
-			console.log("Começou");
-			setTimeout(() => finalizaStroop(), 20 * 60e3); // 20 * 60s 
-		}
-        contaPerguntas++; //COMECA DO 1
-        $("#conta").text(`Questão ${(contaPerguntas + 1)}`);
+    if (tempoRestanteRepouso > 0) {
+        return
+    }
 
-        var limitePerguntas = NUM_DE_PERGUNTAS;
-        if (ordemBateria[testeAtual] == "pI" || ordemBateria[testeAtual] == "pC") {
-            limitePerguntas = NUM_DE_PERGUNTAS_PRE;
+    contaPerguntas++; //COMECA DO 1
+    $("#conta").text(`Questão ${(contaPerguntas + 1)}`);
+
+    var limitePerguntas = NUM_DE_PERGUNTAS;
+    if (ordemBateria[testeAtual] == "pI" || ordemBateria[testeAtual] == "pC") {
+        limitePerguntas = NUM_DE_PERGUNTAS_PRE;
+    }
+
+    if (contaPerguntas <= limitePerguntas) { // Se o teste ainda nao acabou
+        if (ordemBateria[testeAtual] == "I" || ordemBateria[testeAtual] == "C") {
+            var acertou = (cor == resposta) ? 1 : 0;
+
+            var t_resp = (Date.now() - t);
+
+            if (data.respostaStroop[testesSalvos] == null)
+                data.respostaStroop[testesSalvos] = [];
+
+            data.respostaStroop[testesSalvos].push({ acertou, tempo: t_resp.toFixed(2) });
         }
+        mudaCor(ordemBateria[testeAtual]);
+    }
 
-        if (contaPerguntas <= limitePerguntas) { // Se o teste ainda nao acabou
-            if (ordemBateria[testeAtual] == "I" || ordemBateria[testeAtual] == "C") {
-                var acertou = (cor == resposta) ? 1 : 0;
+    if (contaPerguntas >= limitePerguntas) {
+        if (ordemBateria[testeAtual] == "I" || ordemBateria[testeAtual] == "C")
+            testesSalvos++;
+        testeAtual++;
+        if (ordemBateria[testeAtual] == "F") { //Se a bateria acabou
+            finalizaStroop()
+        } else {
+            document.getElementById("label-Stroop").style.color = "000000";
 
-                var t_resp = (Date.now() - t);
+            contaPerguntas = 0, tUltimaResposta = 0, t = 0, resposta = "";
 
-                if (data.respostaStroop[testesSalvos] == null)
-                    data.respostaStroop[testesSalvos] = [];
-
-                data.respostaStroop[testesSalvos].push({ acertou, tempo: t_resp.toFixed(2)});
-            }
-            mudaCor(ordemBateria[testeAtual]);
-        }
-
-        if (contaPerguntas >= limitePerguntas) {
-            if (ordemBateria[testeAtual] == "I" || ordemBateria[testeAtual] == "C")
-                testesSalvos++;
-            testeAtual++;
-            if (ordemBateria[testeAtual] == "F") { //Se a bateria acabou
-                finalizaStroop()
-            } else {
-                document.getElementById("label-Stroop").style.color = "000000";
-
-                contaPerguntas = 0, tUltimaResposta = 0, t = 0, resposta = "";
-
-                tempoRestanteRepouso = tempoRepouso;
-                document.getElementById("countdown").style.display = "block";
-                contagem()
-                repouso();
-            }
+            tempoRestanteRepouso = tempoRepouso;
+            document.getElementById("countdown").style.display = "block";
+            contagem()
+            repouso();
         }
     }
 }
@@ -270,7 +276,7 @@ function finalizaStroop(force = false) {
 
     contaPerguntas = 0;
     data.ordemBateria = ordemBateria;
-    if(tipoTeste == "Stroop-single") {
+    if (tipoTeste == "Stroop-single") {
         console.log("Finalizado");
         enviarDados(data);
         $("#tituloFinal").text("Fim do teste");
@@ -285,6 +291,8 @@ function finalizaStroop(force = false) {
 var lastChoice = -1;
 
 function mudaCor(c_i) {
+    $("#conta-Stroop").text(`Questão ${(contaPerguntas + 1)}`);
+
     var rand, rand2;
 
     let tipo = Math.floor(Math.random() * 10) % 2 == 0 ? "C" : "I";
@@ -298,7 +306,7 @@ function mudaCor(c_i) {
         let cor = cores[rand];
 
         $("#label-Stroop").css("color", cor.hex).text(cor.texto);
-        
+
         resposta = cor.texto;
     } else { // INCONGRUENTE
         rand = Math.floor(Math.random() * 5);
@@ -329,7 +337,7 @@ function mudaCorInpacs() {
         tipoInpacs = tipoInpacs == "I" ? "C" : "I"
     }
 
-    $("#conta-inpacs").text(`Questão ${(contaPerguntas + 1)}`);
+    $("#conta-INPACS").text(`Questão ${(contaPerguntas + 1)}`);
 
     if (tipoInpacs == "I") {
         rand = Math.floor(Math.random() * 5);
@@ -341,7 +349,7 @@ function mudaCorInpacs() {
 
         resposta = cor.texto;
 
-        let botao =  1 + Math.floor(Math.random() * 2);
+        let botao = 1 + Math.floor(Math.random() * 2);
 
         $("#label-INPACS").css("color", cor.hex);
         $(`#opcao-${botao}`).text(cor.texto).val(cor.texto);
@@ -356,7 +364,7 @@ function mudaCorInpacs() {
         do {
             rand2 = (Math.floor(Math.random() * 5)) % 5;
         } while (cores[rand2].texto == cor.texto);
-        
+
         cor2 = cores[rand2];
 
         $(`#opcao-${botao == 1 ? 2 : 1}`).text(cor2.texto).val(cor2.texto);
@@ -370,7 +378,7 @@ function mudaCorInpacs() {
 
         resposta = cor.texto;
 
-        let botao =  1 + Math.floor(Math.random() * 2);
+        let botao = 1 + Math.floor(Math.random() * 2);
 
         $("#label-INPACS").css("color", cor.hex).text(cor.texto);
         $(`#opcao-${botao}`).text(cor.texto).val(cor.texto);
@@ -378,7 +386,7 @@ function mudaCorInpacs() {
         do {
             rand2 = (Math.floor(Math.random() * 5)) % 5;
         } while (cores[rand2].texto == cor.texto);
-        
+
         cor2 = cores[rand2];
 
         $(`#opcao-${botao == 1 ? 2 : 1}`).text(cor2.texto).val(cor2.texto);
@@ -388,20 +396,24 @@ function mudaCorInpacs() {
 }
 
 function respostaINPACS(cor) {
+    if (tempoRestanteRepouso > 0) {
+        return
+    }
+
     contaPerguntas++;
 
     var acertou = (cor == resposta) ? 1 : 0;
     var t_resp = (Date.now() - t);
 
-    let conjunto = ["INPACS-pre","INPACS-single"].includes(tipoTeste) ? "respostaInpacsPre" : "respostaInpacsPos"
+    let conjunto = ["INPACS-pre", "INPACS-single"].includes(tipoTeste) ? "respostaInpacsPre" : "respostaInpacsPos"
 
     if (data[conjunto].length == 0 || data[conjunto][data[conjunto].length - 1].length % 15 == 0) {
         data[conjunto].push([])
     }
 
-    data[conjunto][data[conjunto].length-1].push({ acertou, tempo: t_resp.toFixed(2), tipo: tipoInpacs == "I" ? "Incongruente" : "Congruente"});
+    data[conjunto][data[conjunto].length - 1].push({ acertou, tempo: t_resp.toFixed(2), tipo: tipoInpacs == "I" ? "Incongruente" : "Congruente" });
 
-    if(contaPerguntas == numPerguntasINPACS) {
+    if (contaPerguntas == numPerguntasINPACS) {
         finalizaINPACS()
     } else {
         mudaCorInpacs()
@@ -424,7 +436,7 @@ function contagem() {
         autostart: false,
         label: ["", ""],
         smooth: true,
-        onComplete: () => {}
+        onComplete: () => { }
     });
     countdown.start();
 
@@ -437,7 +449,7 @@ function contagem() {
     }
 
     // Nao sei por que buga as vezes e o relogio vira um quadrado
-    $(window).resize(function() {
+    $(window).resize(function () {
         if (window.innerHeight < 356) {
             $("#countdown").css("top", 355 - 120);
             $("#countdown").css("bottom", "");

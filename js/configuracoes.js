@@ -195,9 +195,7 @@ function downloadCsv() {
 		return;
 	}
 	
-	var tabelaStroop = [[`"Tempo médio","Erros","Acertos"`]];
-	var tabelaInpacsPre = [[`"Tipo","Tempo médio","Erros","Acertos"`]];
-	var tabelaInpacsPos = [[`"Tipo","Tempo médio","Erros","Acertos"`]];
+	var tabela = [];
 
 	var dicionario = {}
 
@@ -211,6 +209,9 @@ function downloadCsv() {
 	}
 
 	// Gera csv INPACS Pre
+
+	tabela.push([`"Tipo","Tempo médio","Erros","Acertos"`])
+
 	for (p in dicionario) {
 		var pessoa = dicionario[p];
 		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
@@ -223,18 +224,17 @@ function downloadCsv() {
 				acertosTotais += acertoParcial;
 				errosTotais += erroParcial;
 
-				tabelaInpacsPre.push([`"${bloco[0].tipo}"`,`"${tempoParcial.toFixed(2)}"`,`"${erroParcial}"`,`"${acertoParcial}"`])
+				tabela.push([`"${bloco[0].tipo}"`,`"${tempoParcial.toFixed(2)}"`,`"${erroParcial}"`,`"${acertoParcial}"`])
 			})
 		});
 
-		tabelaInpacsPre.push([`"Geral"`,`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
+		tabela.push([`"Geral"`,`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
 	}
 
-	let conteudoTabelaInpacsPre = tabelaInpacsPre.join("\n") + "\n";
-
-	geraCsv(conteudoTabelaInpacsPre, "INPACS-PRE.csv");
-
 	// Gera csv Stroop
+
+	tabela.push(["\n"],[`"Tempo médio","Erros","Acertos"`])
+
 	for (p in dicionario) {
 		var pessoa = dicionario[p];
 		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
@@ -250,14 +250,13 @@ function downloadCsv() {
 			errosTotais += erroParcial;
 		});
 
-		tabelaStroop.push([`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
+		tabela.push([`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
 	}
 
-	let conteudoTabelaStroop = tabelaStroop.join("\n") + "\n";
-
-	geraCsv(conteudoTabelaStroop, "STROOP.csv");
-
 	// Gera csv INPACS Pós
+
+	tabela.push(["\n"],`"Tipo","Tempo médio","Erros","Acertos"`)
+
 	for (p in dicionario) {
 		var pessoa = dicionario[p];
 		var acertosTotais = 0, errosTotais = 0, mediaTotal = 0;
@@ -270,16 +269,16 @@ function downloadCsv() {
 				acertosTotais += acertoParcial;
 				errosTotais += erroParcial;
 
-				tabelaInpacsPos.push([`"${bloco[0].tipo}"`,`"${tempoParcial.toFixed(2)}"`,`"${erroParcial}"`,`"${acertoParcial}"`])
+				tabela.push([`"${bloco[0].tipo}"`,`"${tempoParcial.toFixed(2)}"`,`"${erroParcial}"`,`"${acertoParcial}"`])
 			})
 		});
 
-		tabelaInpacsPos.push([`"Geral"`,`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
+		tabela.push([`"Geral"`,`"${mediaTotal.toFixed(2)}"`,`"${errosTotais}"`,`"${acertosTotais}"`])
 	}
 
-	let conteudoTabelaInpacsPos = tabelaInpacsPos.join("\n") + "\n";
+	let conteudoTabela = tabela.join("\n") + "\n";
 
-	geraCsv(conteudoTabelaInpacsPos, "INPACS-POS.csv");
+	geraCsv(conteudoTabela, "resultado.csv");
 }
 
 function geraCsv(conteudo, nome) {

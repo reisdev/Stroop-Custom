@@ -134,7 +134,7 @@ fieldset {
   text-transform: uppercase;
 }
 
-#conta {
+.contador {
   text-align: center;
   padding: 20px;
   font-size: 16px;
