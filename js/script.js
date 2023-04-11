@@ -36,6 +36,7 @@ var testesSalvos = 0; // Indica quantos testes ja foram feitos e salvos ('C' e '
 
 var tipoInpacs = configs.tipoInicioInpacs;
 
+var regTimeout = null; // Guarda timeout
 var tempoRepouso = configs.tempoEntreTeste;
 var tempoRestanteRepouso = tempoRepouso;
 
@@ -86,8 +87,12 @@ document.addEventListener('keydown', function (event) {
 });
 
 function forceFim() {
-    $("#label-Stroop").text("Fim");
-    $("#conta").text("...");
+    clearTimeout(regTimeout);
+
+    let nomeTeste = tipoTeste.split("-")[0];
+    $(`#Teste${nomeTeste},#EscolhaTeste,#countdown`).css("display","none");
+    $(`#label-${nomeTeste}`).text("Fim");
+    $(`#conta-${nomeTeste}`).text("...");
 
     $("#tituloFinal").text("Teste finalizado");
 
@@ -116,7 +121,7 @@ function repouso() {
     if (tempoRestanteRepouso > 0) {
         $(`#label-${nomeTeste}`).text(`A etapa de avaliação vai começar`).css("color","black");
         $(`#conta-${nomeTeste}`).text("...");
-        setTimeout(() => repouso(), 1000);
+        regTimeout = setTimeout(() => repouso(), 1000);
     } else {
         $(`#conta-${nomeTeste}`).text(`Questão ${contaPerguntas + 1}`);
 
@@ -144,7 +149,7 @@ function iniciar() {
         $("#TesteStroop").css("display", "none");
         $("#TesteINPACS").css("display", "block");
     } else {
-        setTimeout(finalizaStroop, 20 * 60e3); // 20 * 60s 
+        regTimeout = setTimeout(finalizaStroop, 0.5 * 60e3); // 20 * 60s 
 
         $("#TesteINPACS").css("display", "none");
         $("#TesteStroop").css("display", "block");
@@ -218,7 +223,7 @@ function respostaTutorial(tipo, cor) {
 }
 
 function respostaStroop(cor) {
-    if (tempoRestanteRepouso > 0) {
+    if (tempoRestanteRepouso > 0 || cor === undefined) {
         return
     }
 
@@ -396,7 +401,7 @@ function mudaCorInpacs() {
 }
 
 function respostaINPACS(cor) {
-    if (tempoRestanteRepouso > 0) {
+    if (tempoRestanteRepouso > 0 || cor === undefined) {
         return
     }
 
