@@ -242,25 +242,29 @@ function downloadCsv() {
         `"${acertoParcial}"`,
       ]);
     });
-
-    tabela.push([
-      `"Geral"`,
-      `"${tempo.toFixed(2)}"`,
-      `"${erros}"`,
-      `"${acertos}"`,
-    ]);
+    
+    if(bateria.respostaInpacsPre.length > 0) {
+      tabela.push([
+        `"Geral"`,
+        `"${tempo.toFixed(2)}"`,
+        `"${erros}"`,
+        `"${acertos}"`,
+      ]);
+    }
 
     // Gera csv Stroop
+    
+    if(bateria.respostaStroop.length > 0) {
+      tabela.push(["\n"], [`"Tempo médio","Erros","Acertos"`]);
+      
+      [tempo, acertos, erros] = mediaTeste(bateria.respostaStroop[0]);
 
-    tabela.push(["\n"], [`"Tempo médio","Erros","Acertos"`]);
-
-	[tempo, acertos, erros] = mediaTeste(bateria.respostaStroop[0]);
-
-    tabela.push([
-      `"${tempo.toFixed(2)}"`,
-      `"${acertos}"`,
-      `"${erros}"`,
-    ]);
+      tabela.push([
+        `"${tempo.toFixed(2)}"`,
+        `"${acertos}"`,
+        `"${erros}"`,
+      ]);
+    }
 
     // Gera csv INPACS Pós
 
